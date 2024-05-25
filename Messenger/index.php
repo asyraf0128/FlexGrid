@@ -126,9 +126,9 @@
           <br>
           <br>
           <div>
-            <label for="radio_chat">Chat <img src="ui/icons/chat.png"></label>
-            <label for="radio_contacts">Contacts <img src="ui/icons/contacts.png"></label>
-            <label for="radio_settings">Settings <img src="ui/icons/settings.png"></label>
+            <label id="label_chat" for="radio_chat">Chat <img src="ui/icons/chat.png"></label>
+            <label id="label_contacts" for="radio_contacts">Contacts <img src="ui/icons/contacts.png"></label>
+            <label id="label_settings" for="radio_settings">Settings <img src="ui/icons/settings.png"></label>
           </div>
 
          </div>
@@ -153,3 +153,32 @@
     </div>
 </body>
 </html>
+
+<script type="text/javascript">
+
+    function _(element){
+
+        return document.getElementById(element);
+    }
+
+    var label = _("label_chat")
+    label.addEventListener("click",function(){
+        
+        var inner_pannel = _("inner_left_pannel");
+
+        var ajax = new XMLHttpRequest();
+        ajax.onload = function(){
+
+            if(ajax.status == 200 || ajax.readyState == 4){
+
+                inner_pannel.innerHTML = ajax.responseText;
+
+            }
+        }
+
+        ajax.open("POST","file.php",true);
+        ajax.send();
+
+    })
+
+</script>
