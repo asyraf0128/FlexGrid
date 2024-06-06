@@ -1,8 +1,8 @@
 <?php
 $dbhost = 'localhost'; 
-$dbname = 'flexgrid';
-$dbuser = 'amir';
-$dbpass = 'H@M21sc0';
+$dbname = 'mydatabase';
+$dbuser = 'root';
+$dbpass = 'Jireh@05';
 
 $connection = new mysqli($dbhost, $dbuser, $dbpass, $dbname);
 if ($connection->connect_error) die("Fatal Error");
@@ -43,16 +43,26 @@ function sanitizeString($var)
 
 function showProfile($user)
 {
-    if (file_exists("$user.jpg"))
-        echo "<img src='$user.jpg' style='float:left;'>";
+    if (file_exists("$user-banner.jpg"))
+    {
+        echo "<img src='$user-banner.jpg' style='width:100%;'>"; 
+    }
+
+    if(file_exists("$user.jpg"))
+    {
+        echo "<img src= '$user.jpg' style='float:left; width:100%;'>";  
+    }   
 
     $result = queryMysql("SELECT * FROM profiles WHERE user='$user'");
 
     if ($result->num_rows)
     {
         $row = $result->fetch_array(MYSQLI_ASSOC);
-        echo stripslashes($row['text']) . "<br style='clear:left;'><br>";
+        echo stripslashes($row['text']) . "<br><br>";
+        echo "Workouts: " . $row['workouts'] . "<br>";
+        echo "Height: " . $row['height'] . "<br>";
+        echo "Weight: " . $row['weight'] . "<br>";
+        echo "Country: " . $row['country'] . "<br>";
     }
-    else echo "<p>Nothing to see here, yet</p><br>";
 }
 ?>
