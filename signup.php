@@ -1,6 +1,5 @@
 <?php
     require_once 'header.php';
-    require_once 'functions.php'; // Assuming this file contains sanitizeString, queryMysql, and destroySession functions
 
     echo <<<_END
     <script>
@@ -69,7 +68,7 @@ _END;
         </div>
         <div data-role='fieldcontain'>
             <label></label>
-            <input data-transition='slide' type='submit' value='Sign Up'>
+            <input type='submit' value='Sign Up'>
         </div>
     </form>
     </body>

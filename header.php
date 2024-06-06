@@ -25,6 +25,8 @@ echo <<<_INIT
         }
         else $loggedin = FALSE;
 
+
+
     echo <<<_MAIN
         <title>FlexGrid: $userstr</title>
         </head>
@@ -32,7 +34,7 @@ echo <<<_INIT
             <div data-role='page'>
                 <div data-role='header'>
                     <div id='logo'
-                        class='center'>Flex<img id='flex' src='flex.gif'>Grid</div>
+                        class='center'><img id='flex' src='flexgridicon.jpg'>FlexGrid</div>
                     <div class='username'>$userstr</div>
                 </div>
                 <div data-role='content'>
@@ -44,17 +46,19 @@ echo <<<_INIT
         echo <<<_LOGGEDIN
                 <div class='center'>
                     <a data-role='button' data-inline='true' data-icon='home'
-                        data-transition="slide" href='members.php?view=$user'>Home</a>
+                        href='index.php'>Home</a>
                     <a data-role='button' data-inline='true'
-                        data-transition="slide" href='members.php'>Members</a>
+                        href='members.php'>Members</a>
                     <a data-role='button' data-inline='true'
-                        data-transition="slide" href='friends.php'>Friends</a>
+                        href='friends.php'>Friends</a>
                     <a data-role='button' data-inline='true'
-                        data-transition="slide" href='messages.php'>Messages</a>
+                        href='messages.php'>Messages</a>
                     <a data-role='button' data-inline='true'
-                        data-transition="slide" href='profile.php'>Edit Profile</a>
+                        href='profile.php'>Edit Profile</a>
                     <a data-role='button' data-inline='true'
-                        data-transition="slide" href='logout.php'>Log Out</a>
+                        href='logout.php'>Log Out</a>
+                    <a data-role='button' data-inline='true'
+                        href='create_post.php'>Create Post</a>
                 </div>
         _LOGGEDIN;
             }
@@ -63,11 +67,11 @@ echo <<<_INIT
         echo <<<_GUEST
                 <div class='center'>
                     <a data-role='button' data-inline='true' data-icon='home'
-                        data-transition='slide' href ='index.php'>Home</a>
+                        href ='index.php'>Home</a>
                     <a data-role='button' data-inline='true' data-icon='home'
-                        data-transition='slide' href ='signup.php'>Sign Up</a>
+                        href ='signup.php'>Sign Up</a>
                     <a data-role='button' data-inline='true' data-icon='home'
-                        data-transition='slide' href ='login.php'>Log In</a>
+                        href ='login.php'>Log In</a>
                 </div>
                 <p class='info'>(You must be logged in to use this app)</p>
 

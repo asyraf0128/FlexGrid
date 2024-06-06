@@ -8,6 +8,9 @@
         <h3>Setting up...</h3>
 
     <?php
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
         require_once 'functions.php';
 
         createTable('members',
@@ -40,6 +43,36 @@
                     'user VARCHAR(16),
                     split VARCHAR(4096),
                     INDEX(split(6))');
+
+        createTable('posts',
+                    'id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    user VARCHAR(16),
+                    title VARCHAR(255) NOT NULL,
+                    description TEXT,
+                    split VARCHAR(255),
+                    image VARCHAR(255),
+                    video VARCHAR(255),
+                    visibility ENUM(\'public\', \'private\') DEFAULT \'public\',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+        
+        createTable('likes',
+                    'id INT AUTO_INCREMENT PRIMARY KEY,
+                    user VARCHAR(16),
+                    post_id INT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+        
+        createTable('comments',
+                    'id INT AUTO_INCREMENT PRIMARY KEY,
+                    user VARCHAR(16),
+                    post_id INT,
+                    comment TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+                
+        createTable('shares',
+                    'id INT AUTO_INCREMENT PRIMARY KEY,
+                    user VARCHAR(16),
+                    post_id INT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
         ?>
             <br>...done.
     </body>
