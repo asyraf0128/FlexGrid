@@ -53,7 +53,8 @@
                     image VARCHAR(255),
                     video VARCHAR(255),
                     visibility ENUM(\'public\', \'private\') DEFAULT \'public\',
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    is_workout BOOLEAN DEFAULT FALSE');
         
         createTable('likes',
                     'id INT AUTO_INCREMENT PRIMARY KEY,
@@ -72,7 +73,9 @@
                     'id INT AUTO_INCREMENT PRIMARY KEY,
                     user VARCHAR(16),
                     post_id INT,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+
+        
         ?>
             <br>...done.
     </body>

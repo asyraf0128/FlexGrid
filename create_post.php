@@ -48,7 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         if (empty($error)) {
-            $result = queryMysql("INSERT INTO posts (user, title, description, split, image, video, visibility) VALUES ('$user', '$title', '$description', '$split', '$imagePath', '$videoPath', '$visibility')");
+            $is_workout = !empty($split) ? 1 : 0;
+            $imagePath = $imageUploaded ? "'$imagePath'" : 'NULL';
+            $videoPath = $videoUploaded ? "'$videoPath'" : 'NULL';
+
+            $result = queryMysql("INSERT INTO posts (user, title, description, split, image, video, visibility, is_workout) VALUES ('$user', '$title', '$description', '$split', $imagePath, $videoPath, '$visibility', $is_workout)");
+
             if ($result) {
                 header("Location: index.php");
                 exit();
