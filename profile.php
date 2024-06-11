@@ -93,53 +93,6 @@
         }
     }
 
-if (isset($_FILES['banner']['name']))
-{
-    $saveto ="$user-banner.jpg";
-    move_uploaded_file($_FILES['banner']['tmp_name'], $saveto);
-    $typeok = TRUE;
-
-    switch ($_FILES['banner']['type'])
-    {
-        case "image/gif": $src = imagecreatefromgif($saveto); break;
-        case "image/jpeg":
-        case "image/pjpeg": $src = imagecreatefrompjpeg($saveto); break;
-        case "image/png": $src = imagecreatefrompng($saveto); break;
-        default: $typeok = FALSE; break;
-    }
-    
-    if ($typeok)
-    {
-        list($w, $h) = getimagesize($saveto);
-
-        $max = 800;
-        $tw = $w;
-        $th = $h;
-
-        if ($w > $h && $max < $w)
-        {
-            $th = $max / $w * $h;
-            $tw = $max;
-        }
-        else if ($h > $w && $max < $h)
-        {
-            $tw = $max / $h * $w;
-            $th = $max;
-        }
-        else if ($max < $w)
-        {
-            $tw = $th = $max;
-        }
-        
-        $tmp = imagecreatetruecolor($tw, $th);
-        imagecopyresampled($tmp, src, 0, 0, 0, 0, $tw, $th, $w, $h);
-        imageconvolution($tmp, array(array(-1, -1, -1), array(-1, 16, -1), array(-1, -1, -1)), 8, 0);
-        imagejpeg($tmp, $saveto);
-        imagedestroy($tmp);
-        imagedestroy($src);
-    }
-
-}
 
 showProfile($user);
 
@@ -151,17 +104,24 @@ echo <<<_END
         Workouts: <input type ='number' name='workouts' value='$workouts'><br>
         Height: <input type='text' name='height' value='$height'><br>
         Weight: <input type='text' name='weight' value='$weight'><br>
-        Country: <input type='text' name='country' value='$country'><br>
-        Profile Image: <input type='file' name='image' size='14'><br>
-        Banner Image: <input type='file' name='banner' size='14'><br>
-        <input type='submit' value='Save Profile'>
-        </form>
-    </div><br>
-    </body>
-</html>
+        Country: 
+        <select name='country'>
 _END;
 
+$countries = ["Brunei Darussalam", "Cambodia", "Indonesia", "Lao PDR", "Malaysia", "Myanmar", "Philippines", "Singapore", "Thailand", "Viet Nam"];
+foreach ($countries as $c) {
+    $selected = ($c == $country) ? "selected" : "";
+    echo "<option value='$c' $selected>$c</option>";
+}
 
+echo <<<_END
+        </select><br>
+        Profile Image: <input type='file' name='image' size='14'><br>
+        <input type='submit' value='Save Profile'>
+    </form>
+</div><br>
+</body>
+</html>
+_END;
 ?>
-
  

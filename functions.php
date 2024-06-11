@@ -43,11 +43,7 @@ function sanitizeString($var)
 
 function showProfile($user)
 {
-    if (file_exists("$user-banner.jpg"))
-    {
-        echo "<img src='$user-banner.jpg' style='width:100%;'>"; 
-    }
-
+    
     if(file_exists("$user.jpg"))
     {
         echo "<img src= '$user.jpg' style='float:left; width:100%;'>";  
