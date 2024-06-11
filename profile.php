@@ -15,12 +15,26 @@
         $height = sanitizeString($_POST['height']);
         $weight = sanitizeString($_POST['weight']);
         $country = sanitizeString($_POST['country']);
+        $image = NULL;
 
-        if ($result->num_rows)
-            queryMysql("UPDATE profiles SET text='$text', workouts='$workouts', height='$height', weight='$weight', country='$country' where user='$user'");
-        else queryMysql("INSERT INTO profiles (user, text, workouts, height, weight, country)VALUES('$user', '$text', '$workouts', '$height', '$weight', '$country')");      
+       // Check if an image was uploaded
+    if (isset($_FILES['image']['tmp_name']) && $_FILES['image']['tmp_name'] != '') {
+        $image = file_get_contents($_FILES['image']['tmp_name']);
+        $image = $connection->real_escape_string($image);
     }
 
+    if ($result->num_rows) {
+        // Update the existing profile
+        if ($image) {
+            queryMysql("UPDATE profiles SET text='$text', workouts='$workouts', height='$height', weight='$weight', country='$country', image='$image' WHERE user='$user'");
+        } else {
+            queryMysql("UPDATE profiles SET text='$text', workouts='$workouts', height='$height', weight='$weight', country='$country' WHERE user='$user'");
+        }
+    } else {
+        // Insert a new profile
+        queryMysql("INSERT INTO profiles (user, text, workouts, height, weight, country, image) VALUES ('$user', '$text', '$workouts', '$height', '$weight', '$country', '$image')");
+    }
+}
     else
     {
         if ($result->num_rows)
@@ -31,6 +45,7 @@
             $height = $row['height'];
             $weight = $row['weight'];
             $country = $row['country'];
+            $image = $row['image'];
 
         }
         else 
@@ -40,59 +55,11 @@
             $height = "";
             $weight = "";
             $country = "";
+            $image = NULL;
         }
     }
 
     $text = stripslashes(preg_replace('/\s\s+/', '', $text));
-
-    if (isset($_FILES['image']['name']))
-    {
-        $saveto = "$user.jpg";
-        move_uploaded_file($_FILES['image']['tmp_name'], $saveto);
-        $typeok = TRUE;
-
-        switch($_FILES['image']['type'])
-        {
-            case "image/gif": $src = imagecreatefromgif($saveto); break;
-            case "image/jpeg": // Both regular and progressive jpegs
-            case "image/pjpeg": $src = imagecreatefromjpeg($saveto); break;
-            case "image/png": $src = imagecreatefrompng($saveto); break;
-            default: $typeok = FALSE; break;  
-        }
-
-        if ($typeok)
-        {
-            list($w, $h) = getimagesize($saveto);
-
-            $max = 100;
-            $tw = $w;
-            $th = $h;
-
-            if ($w > $h && $max < $w)
-            {
-                $th = $max / $w * $h;
-                $tw = $max;
-            }
-            elseif ($h > $w && $max < $h)
-            {
-                $tw = $max / $h * $w;
-                $th = $max;
-            }
-            elseif ($max < $w)
-            {
-                $tw = $th = $max;
-            }
-
-            $tmp = imagecreatetruecolor($tw, $th);
-            imagecopyresampled($tmp, $src, 0, 0, 0, 0, $tw, $th, $w, $h);
-            imageconvolution($tmp, array(array(-1, -1, -1),
-                array(-1, 16, -1), array(-1, -1, -1)), 8, 0);
-            imagejpeg($tmp, $saveto);
-            imagedestroy($tmp);
-            imagedestroy($src);
-        }
-    }
-
 
 showProfile($user);
 
