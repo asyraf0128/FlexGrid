@@ -67,6 +67,15 @@ if ($num == 0) {
 
         if ($split) echo "<p>Split: $split</p>";
 
+         // Display delete button if the post belongs to the logged-in user
+         if ($postUser == $user) {
+            echo "<form method='post' action='delete_post.php' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'>
+                <input type='hidden' name='post_id' value='$postId'>
+                <input type='hidden' name='slug' value='$slug'>
+                <button type='submit'>Delete</button>
+            </form>";
+        }
+
         echo "</div>";
     }
 }

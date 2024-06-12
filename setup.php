@@ -39,11 +39,6 @@
                     text VARCHAR(4096),
                     INDEX(user(6))');
 
-        createTable('splits',
-                    'user VARCHAR(16),
-                    split VARCHAR(4096),
-                    INDEX(split(6))');
-
         createTable('posts',
                     'id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                     user VARCHAR(16),
@@ -57,14 +52,31 @@
                     is_workout BOOLEAN DEFAULT FALSE,
                     num_replies INT UNSIGNED DEFAULT 0,
                     num_views INT UNSIGNED DEFAULT 0');
-        
-        createTable('comments',
+
+
+        createTable('split_groups',
                     'id INT AUTO_INCREMENT PRIMARY KEY,
-                    user VARCHAR(16),
-                    post_id INT,
-                    comment TEXT,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
-                
+                    user VARCHAR(255) NOT NULL,
+                    name VARCHAR(255) NOT NULL,
+                    is_default BOOLEAN DEFAULT FALSE');
+                    
+                    
+        createTable('splits',
+                    'id INT AUTO_INCREMENT PRIMARY KEY,
+                    group_id INT NOT NULL,
+                    name VARCHAR(255) NOT NULL');
+                    
+        createTable('workouts', 
+                    'id INT AUTO_INCREMENT PRIMARY KEY,
+                    split_id INT NOT NULL,
+                    name VARCHAR(255) NOT NULL');
+                    
+        createTable('sets_reps',
+                    'id INT AUTO_INCREMENT PRIMARY KEY,
+                    workout_id INT NOT NULL,
+                    sets INT NOT NULL,
+                    reps INT NOT NULL');
+                         
         
         ?>
             <br>...done.
