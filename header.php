@@ -7,10 +7,8 @@ echo <<<_INIT
                     <head>
                         <meta charset='utf-8'>
                         <meta name='viewport' content='width=device-width, initial-scale=1'>
-                        <link rel='stylesheet' href='jquery.mobile-1.4.5.min.css'>
                         <link rel='stylesheet' href='styles.css'>
-                        <script src='jquery-3.7.1.min.js'></script>
-                        
+                        <script src='jquery-3.7.1.min.js'></script>                   
     _INIT;
 
         require_once 'functions.php';

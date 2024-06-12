@@ -56,20 +56,8 @@ function showProfile($user)
     else echo "<p>Nothing to see here, yet</p><br>";
 }
 
-function addLike($user, $post_id) {
-    queryMysql("INSERT INTO likes (user, post_id) VALUES ('$user', '$post_id')");
+function generateSlug($string) {
+    $slug = preg_replace('/[^A-Za-z0-9-]+/', '-', strtolower($string));
+    return trim($slug, '-');
 }
-
-function removeLike($user, $post_id) {
-    queryMysql("DELETE FROM likes WHERE user='$user' AND post_id='$post_id'");
-}
-
-function addComment($user, $post_id, $comment) {
-    queryMysql("INSERT INTO comments (user, post_id, comment) VALUES ('$user', '$post_id', '$comment')");
-}
-
-function addShare($user, $post_id) {
-    queryMysql("INSERT INTO shares (user, post_id) VALUES ('$user', '$post_id')");
-}
-
 ?>

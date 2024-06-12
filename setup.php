@@ -48,19 +48,15 @@
                     'id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                     user VARCHAR(16),
                     title VARCHAR(255) NOT NULL,
+                    slug VARCHAR (255) NOT NULL UNIQUE,
                     description TEXT,
                     split VARCHAR(255),
-                    image VARCHAR(255),
-                    video VARCHAR(255),
+                    media TEXT,
                     visibility ENUM(\'public\', \'private\') DEFAULT \'public\',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    is_workout BOOLEAN DEFAULT FALSE');
-        
-        createTable('likes',
-                    'id INT AUTO_INCREMENT PRIMARY KEY,
-                    user VARCHAR(16),
-                    post_id INT,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+                    is_workout BOOLEAN DEFAULT FALSE,
+                    num_replies INT UNSIGNED DEFAULT 0,
+                    num_views INT UNSIGNED DEFAULT 0');
         
         createTable('comments',
                     'id INT AUTO_INCREMENT PRIMARY KEY,
@@ -69,12 +65,6 @@
                     comment TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
                 
-        createTable('shares',
-                    'id INT AUTO_INCREMENT PRIMARY KEY,
-                    user VARCHAR(16),
-                    post_id INT,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
-
         
         ?>
             <br>...done.

@@ -1,7 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 require_once 'header.php';
 
 if (!$loggedin) die("</div></body></html>");
@@ -11,8 +8,8 @@ $title = '';
 $description = '';
 $split = '';
 $visibility = 'public';
-$mediaPaths = [];
-
+$imagePath = '';
+$videoPath = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['discard'])) {
@@ -25,55 +22,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $split = sanitizeString($_POST['split']);
     $visibility = sanitizeString($_POST['visibility']);
 
-
-    // Generate slug
-    $slug = generateSlug($title);
-    
-    // Ensure unique slug
-    $existingSlugs = queryMysql("SELECT slug FROM posts WHERE slug LIKE '$slug%'");
-    $slugCount = $existingSlugs->num_rows;
-    if ($slugCount > 0) {
-        $slug .= '-' . ($slugCount + 1);
-    }
-
     if (empty($title)) {
         $error = 'Title is required.';
     } else {
         $uploadsDir = 'uploads/';
-        $mediaUploaded = false;
+        $imageUploaded = false;
+        $videoUploaded = false;
 
-        foreach ($_FILES['media']['name'] as $key => $name) {
-            if (!empty($name)) {
-                $mediaPath = $uploadsDir . basename($name);
-                $tmpName = $_FILES['media']['tmp_name'][$key];
+        if (!empty($_FILES['image']['name'])) {
+            $imagePath = $uploadsDir . basename($_FILES['image']['name']);
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $imagePath)) {
+                $imageUploaded = true;
+            } else {
+                $error = 'Failed to upload image.';
+            }
+        }
 
-                if (file_exists($tmpName) && is_uploaded_file($tmpName)) {
-                    $fileType = mime_content_type($tmpName);
-
-                    if (strpos($fileType, 'image/') === 0 || strpos($fileType, 'video/') === 0) {
-                        if (move_uploaded_file($tmpName, $mediaPath)) {
-                            $mediaPaths[] = $mediaPath;
-                            $mediaUploaded = true;
-                        } else {
-                            $error = 'Failed to upload file: ' . $name;
-                            break;
-                        }
-                    } else {
-                        $error = 'Invalid file type: ' . $name;
-                        break;
-                    }
-                } else {
-                    $error = 'Temporary file for ' . $name . ' does not exist.';
-                    break;
-                }
+        if (!empty($_FILES['video']['name'])) {
+            $videoPath = $uploadsDir . basename($_FILES['video']['name']);
+            if (move_uploaded_file($_FILES['video']['tmp_name'], $videoPath)) {
+                $videoUploaded = true;
+            } else {
+                $error = 'Failed to upload video.';
             }
         }
 
         if (empty($error)) {
             $is_workout = !empty($split) ? 1 : 0;
-            $mediaSerialized = $mediaUploaded ? "'" . serialize($mediaPaths) . "'" : 'NULL';
+            $imagePath = $imageUploaded ? "'$imagePath'" : 'NULL';
+            $videoPath = $videoUploaded ? "'$videoPath'" : 'NULL';
 
-            $result = queryMysql("INSERT INTO posts (user, title, slug, description, split, media, visibility, is_workout) VALUES ('$user', '$title', '$slug', '$description', '$split', $mediaSerialized, '$visibility', $is_workout)");
+            $result = queryMysql("INSERT INTO posts (user, title, description, split, image, video, visibility, is_workout) VALUES ('$user', '$title', '$description', '$split', $imagePath, $videoPath, '$visibility', $is_workout)");
 
             if ($result) {
                 header("Location: index.php");
@@ -114,46 +93,49 @@ echo <<<_END
             </select>
         </div>
         <div data-role='fieldcontain'>
-            <label for='media'>Upload Image/Video:</label>
-            <input type='file' id='media' name='media[]' accept='image/*,video/*' multiple onchange="previewFiles()">
+            <label for='image'>Upload Image:</label>
+            <input type='file' id='image' name='image' onchange="previewFile('image')">
+        </div>
+        <div data-role='fieldcontain'>
+            <label for='video'>Upload Video:</label>
+            <input type='file' id='video' name='video' onchange="previewFile('video')">
         </div>
         <div id="preview-container">
             <!-- Thumbnails will be shown here -->
         </div>
         <div data-role='fieldcontain'>
-            <button type='button' onclick="removeFiles()">Remove Media</button>
+            <button type='button' onclick="removeFile('image')">Remove Image</button>
+            <button type='button' onclick="removeFile('video')">Remove Video</button>
         </div>
         <div data-role='fieldcontain'>
-            <input type='submit' value='Create Post'>
+            <input data-transition='slide' type='submit' value='Create Post'>
             <button type='submit' name='discard' value='discard'>Discard Post</button>
         </div>
     </form>
     <div class='center'>$error</div>
 </div>
 <script>
-    function previewFiles() {
-        const files = document.getElementById('media').files;
+    function previewFile(type) {
+        const file = document.getElementById(type).files[0];
         const previewContainer = document.getElementById('preview-container');
         previewContainer.innerHTML = '';
-        for (const file of files) {
+        if (file) {
             const reader = new FileReader();
             reader.onload = function(event) {
-                let preview;
-                if (file.type.startsWith('image/')) {
-                    preview = document.createElement('img');
-                } else if (file.type.startsWith('video/')) {
-                    preview = document.createElement('video');
+                const preview = document.createElement(type === 'image' ? 'img' : 'video');
+                preview.src = event.target.result;
+                preview.width = 200;
+                if (type === 'video') {
                     preview.controls = true;
                 }
-                preview.src = event.target.result;
                 previewContainer.appendChild(preview);
             };
             reader.readAsDataURL(file);
         }
     }
 
-    function removeFiles() {
-        document.getElementById('media').value = '';
+    function removeFile(type) {
+        document.getElementById(type).value = '';
         document.getElementById('preview-container').innerHTML = '';
     }
 
