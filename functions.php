@@ -1,8 +1,8 @@
 <?php
 $dbhost = 'localhost'; 
 $dbname = 'flexgrid';
-$dbuser = 'amir';
-$dbpass = 'H@M21sc0';
+$dbuser = 'root';
+$dbpass = 'Asy-120512';
 
 $connection = new mysqli($dbhost, $dbuser, $dbpass, $dbname);
 if ($connection->connect_error) die("Fatal Error");
@@ -41,18 +41,23 @@ function sanitizeString($var)
     return $connection->real_escape_string($var);
 }
 
-function showProfile($user)
-{
-    if (file_exists("$user.jpg"))
-        echo "<img src='$user.jpg' style='float:left;'>";
-
+function showProfile($user){
     $result = queryMysql("SELECT * FROM profiles WHERE user='$user'");
-
+   
     if ($result->num_rows)
     {
         $row = $result->fetch_array(MYSQLI_ASSOC);
-        echo stripslashes($row['text']) . "<br style='clear:left;'><br>";
+
+        echo stripslashes($row['text']) . "<br><br>";
+        echo "Workouts: " . $row['workouts'] . "<br>";
+        echo "Height: " . $row['height'] . "<br>";
+        echo "Weight: " . $row['weight'] . "<br>";
+        echo "Country: " . $row['country'] . "<br>";
+
+        if (!empty($row['image'])) {
+            $imageData = base64_encode($row['image']);
+            echo "<br><img src='data:image/jpeg;base64,$imageData' alt='Profile Image'><br>";
+        }
     }
-    else echo "<p>Nothing to see here, yet</p><br>";
 }
 ?>

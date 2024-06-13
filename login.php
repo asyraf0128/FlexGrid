@@ -23,7 +23,7 @@
                 $_SESSION['user'] = $user;
                 $_SESSION['pass'] = $pass;
                 die("You are now loggged in. Please <a data-transition='slide'
-                    href='members.php?view=$user'>click here</a> to continue.</div>
+                    href='header.php?view=$user'>click here</a> to continue.</div>
                         </body></html>");
             }
         }
@@ -45,7 +45,7 @@
                 </div>
                 <div data-role='fieldcontain'>
                     <label>Password</label>
-                    <input type='password' maxlength='16' name'pass' value='$pass'>
+                    <input type='password' maxlength='16' name='pass' value='$pass'>
                 </div>
                 <div data-role='fieldcontain'>
                     <label></label>
