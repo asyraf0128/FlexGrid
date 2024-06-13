@@ -37,7 +37,8 @@
         createTable('profiles',
                     'user VARCHAR(16),
                     text VARCHAR(4096),
-                    INDEX(user(6))');
+                    INDEX(user(6)),
+                    image LONGBLOB');
 
         createTable('splits',
                     'user VARCHAR(16),

@@ -52,7 +52,7 @@ echo <<<_INIT
                     <a data-role='button' data-inline='true'
                         data-transition="slide" href='messages.php'>Messages</a>
                     <a data-role='button' data-inline='true'
-                        data-transition="slide" href='profile.php'>Edit Profile</a>
+                        data-transition="slide" href='my_profile.php'>My Profile</a>
                     <a data-role='button' data-inline='true'
                         data-transition="slide" href='logout.php'>Log Out</a>
                 </div>
