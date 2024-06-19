@@ -54,23 +54,31 @@ _END;
 
     echo <<<_END
     <form method='post' action='signup.php'>$error
-        <div data-role='fieldcontain'>
-            <label></label>
-            Please enter your desired username and password
+    <div class="imgcontainer">
+        <img src="flexgridlogo.jpg" alt="Logo" class="logo">
+    </div>
+
+    <div class="container">
+        <div class="form-box">
+            <div data-role='fieldcontain' class='details'>
+                <label></label>
+                Please enter your desired username and password
+            </div>
+            <div data-role='fieldcontain'>
+                <label class='username'>Username</label>
+                <input type='text' placeholder="Enter Username" maxlength='16' name='user' value='$user' onBlur='checkUser(this)'>
+                <label></label><div id='used'>&nbsp;</div>
+            </div>
+            <div data-role='fieldcontain'>
+                <label class='password'>Password</label>
+                <input type='password' placeholder="Enter Password" maxlength='16' name='pass' value='$pass'>
+            </div>
+            <div data-role='fieldcontain'>
+                <label></label>
+                <input class='button' data-transition='slide' type='submit' value='Sign Up'>
+            </div>
         </div>
-        <div data-role='fieldcontain'>
-            <label>Username</label>
-            <input type='text' maxlength='16' name='user' value='$user' onBlur='checkUser(this)'>
-            <label></label><div id='used'>&nbsp;</div>
-        </div>
-        <div data-role='fieldcontain'>
-            <label>Password</label>
-            <input type='password' maxlength='16' name='pass' value='$pass'>
-        </div>
-        <div data-role='fieldcontain'>
-            <label></label>
-            <input data-transition='slide' type='submit' value='Sign Up'>
-        </div>
+    </div>
     </form>
     </body>
     </html>

@@ -41,3 +41,7 @@ label.logo {
     padding: 0 100px;
     font-weight: bold;
 }
+
+.container{
+    padding: 16px;
+}

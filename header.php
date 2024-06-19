@@ -10,6 +10,7 @@ echo <<<_INIT
                         <link rel='stylesheet' href='jquery.mobile-1.4.5.min.css'>
                         <link rel='stylesheet' href='styles.css'>
                         <link rel='stylesheet' href='home.css'>
+                        <link rel='stylesheet' href='signupandlogin.css'>
                         <script src='jquery-3.7.1.min.js'></script>
                         
     _INIT;
