@@ -7,14 +7,31 @@ require_once 'header.php';
 if (!$loggedin) die("</div></body></html>");
 
 $error = '';
+$postId = '';
 $title = '';
 $description = '';
 $split = '';
-$visibility = 'public';
+$visibility = '';
 $mediaPaths = [];
 
 // Fetch split groups for the logged-in user
 $splitGroups = queryMysql("SELECT * FROM split_groups WHERE user='$user'");
+
+if (isset($_GET['id'])) {
+    $postId = sanitizeString($_GET['id']);
+    $post = queryMysql("SELECT * FROM posts WHERE id='$postId' AND user='$user'");
+
+    if ($post->num_rows == 0) {
+        die("Post not found or you don't have permission to edit this post.</div></body></html>");
+    }
+
+    $post = $post->fetch_assoc();
+    $title = htmlspecialchars($post['title']);
+    $description = htmlspecialchars($post['description']);
+    $split = $post['split'];
+    $visibility = $post['visibility'];
+    $mediaPaths = unserialize($post['media']);
+}
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -24,19 +41,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    // Fetch default split group id for the user
-    $defaultSplit = queryMysql("SELECT id FROM split_groups WHERE user='$user' AND is_default=TRUE");
-    $defaultSplitId = $defaultSplit->num_rows > 0 ? $defaultSplit->fetch_assoc()['id'] : null;
-
     // Sanitize input values
-    $splitId = sanitizeString($_POST['split']) ?: $defaultSplitId;
+    $splitId = sanitizeString($_POST['split']);
     $title = sanitizeString($_POST['title']);
     $description = sanitizeString($_POST['description']);
     $visibility = sanitizeString($_POST['visibility']);
 
     // Generate unique slug for the post
     $slug = generateSlug($title);
-    $existingSlugs = queryMysql("SELECT slug FROM posts WHERE slug LIKE '$slug%'");
+    $existingSlugs = queryMysql("SELECT slug FROM posts WHERE slug LIKE '$slug%' AND id != '$postId'");
     $slugCount = $existingSlugs->num_rows;
     if ($slugCount > 0) {
         $slug .= '-' . ($slugCount + 1);
@@ -78,42 +91,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
-        // If no errors, proceed to insert into database
+        // If no errors, proceed to update the database
         if (empty($error)) {
             $is_workout = !empty($split) ? 1 : 0;
             $mediaSerialized = $mediaUploaded ? "'" . serialize($mediaPaths) . "'" : 'NULL';
 
-            // Insert post into database
-            $query = "INSERT INTO posts (user, title, slug, description, split, media, visibility, is_workout) 
-                      VALUES ('$user', '$title', '$slug', '$description', '$splitId', $mediaSerialized, '$visibility', $is_workout)";
+            // Update post in database
+            $result = queryMysql("UPDATE posts SET title='$title', slug='$slug', description='$description', split='$splitId', media=$mediaSerialized, visibility='$visibility', is_workout='$is_workout' WHERE id='$postId' AND user='$user'");
 
-            if (queryMysql($query)) {
-                global $connection;
-                $postId = $connection->insert_id; // Using the connection object to get the last inserted ID
-                echo "Debug: Post ID is " . $postId; // Debugging statement
-
-                if (!empty($_POST['workouts'])) {
-                    foreach ($_POST['workouts'] as $workoutId => $details) {
-                        // Sanitize and validate workout details
-                        $weight = isset($details['weight']) ? sanitizeString($details['weight']) : null;
-                        $sets = isset($details['sets']) ? sanitizeString($details['sets']) : null;
-                        $reps = isset($details['reps']) ? sanitizeString($details['reps']) : null;
-
-                        // Validate weight (assuming it's required)
-                        if ($weight === null || $weight === '') {
-                            $error = 'Weight is required.';
-                            break;
-                        }
-
-                        // Insert workout details into workout_details table
-                        queryMysql("INSERT INTO workout_details (post_id, workout_id, weight, sets, reps) 
-                                    VALUES ('$postId', '$workoutId', '$weight', '$sets', '$reps')");
-                    }
-                }
+            if ($result) {
                 header("Location: index.php");
                 exit();
             } else {
-                $error = 'Failed to create post. Please try again.';
+                $error = 'Failed to update post. Please try again.';
             }
         }
     }
@@ -121,32 +111,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 ?>
 
 <div class="center">
-    <h3>Create a Post</h3>
-    <form method="post" action="create_post.php" enctype="multipart/form-data" onsubmit="return confirmDiscard(event)">
+    <h3>Edit Post</h3>
+    <form method="post" action="edit_post.php?id=<?= $postId ?>" enctype="multipart/form-data" onsubmit="return confirmDiscard(event)">
         <div data-role="fieldcontain">
             <label for="title">Post Title:</label>
-            <input type="text" id="title" name="title" value="<?= htmlspecialchars($title) ?>" required>
+            <input type="text" id="title" name="title" value="<?= $title ?>" required>
         </div>
         <div data-role="fieldcontain">
             <label for="description">Post Description:</label>
-            <textarea id="description" name="description"><?= htmlspecialchars($description) ?></textarea>
+            <textarea id="description" name="description"><?= $description ?></textarea>
         </div>
         <div data-role="fieldcontain">
             <label for="split">Select Split:</label>
-            <select id="split" name="split" onchange="fetchWorkouts(this.value)">
+            <select id="split" name="split">
                 <option value="">Select...</option>
                 <?php
                 if ($splitGroups->num_rows > 0) {
                     while ($group = $splitGroups->fetch_assoc()) {
                         $groupId = $group['id'];
                         $groupName = htmlspecialchars($group['name']);
-                        echo "<option value='$groupId'>$groupName</option>";
+                        $selected = $groupId == $split ? 'selected' : '';
+                        echo "<option value='$groupId' $selected>$groupName</option>";
                     }
                 }
                 ?>
             </select>
         </div>
-        <div id="workout-container"></div>
         <div data-role="fieldcontain">
             <label for="visibility">Post Visibility:</label>
             <select id="visibility" name="visibility">
@@ -158,13 +148,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <label for="media">Upload Image/Video:</label>
             <input type="file" id="media" name="media[]" accept="image/*,video/*" multiple onchange="previewFiles()">
         </div>
-        <div id="preview-container"></div>
+        <div id="preview-container">
+            <!-- Existing Thumbnails will be shown here -->
+            <?php
+            if (!empty($mediaPaths)) {
+                foreach ($mediaPaths as $mediaPath) {
+                    if (strpos(mime_content_type($mediaPath), 'image/') === 0) {
+                        echo "<img src='$mediaPath' style='max-width: 100px; max-height: 100px;'>";
+                    } else if (strpos(mime_content_type($mediaPath), 'video/') === 0) {
+                        echo "<video src='$mediaPath' style='max-width: 100px; max-height: 100px;' controls></video>";
+                    }
+                }
+            }
+            ?>
+        </div>
         <div data-role="fieldcontain">
             <button type="button" onclick="removeFiles()">Remove Media</button>
         </div>
         <div data-role="fieldcontain">
-            <input type="submit" value="Create Post">
-            <button type="submit" name="discard" value="discard">Discard Post</button>
+            <input type="submit" value="Update Post">
+            <button type="submit" name="discard" value="discard">Discard Changes</button>
         </div>
     </form>
     <div class="center"><?= $error ?></div>
@@ -199,31 +202,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     function confirmDiscard(event) {
         if (event.submitter.name === 'discard') {
-            return confirm('Are you sure you want to discard this post?');
+            return confirm('Are you sure you want to discard the changes?');
         }
         return true;
-    }
-
-    function fetchWorkouts(splitId) {
-        if (!splitId) {
-            document.getElementById('workout-container').innerHTML = '';
-            return;
-        }
-
-        fetch('fetch_workouts.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({
-                split_id: splitId
-            })
-        })
-        .then(response => response.text())
-        .then(html => {
-            document.getElementById('workout-container').innerHTML = html;
-        })
-        .catch(error => console.error('Error fetching workouts:', error));
     }
 </script>
 </body>

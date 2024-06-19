@@ -1,8 +1,7 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 require_once 'header.php';
+
+echo "<title>Welcome to FlexGrid</title>";
 
 if (!$loggedin) die("</div></body></html>");
 
@@ -10,14 +9,19 @@ echo "<div class='center'>";
 
 // Get the posts from the database
 $query = "
-    SELECT posts.id, posts.user, posts.title, posts.slug, posts.description, posts.split, posts.media, posts.visibility, posts.created_at, posts.num_replies, posts.num_views
+    SELECT posts.id, posts.user, posts.title, posts.slug, posts.description, split_groups.name as split_name, posts.media, posts.visibility, posts.created_at, posts.num_replies, posts.num_views
     FROM posts 
-    INNER JOIN friends ON posts.user = friends.user
+    LEFT JOIN friends ON posts.user = friends.user
+    LEFT JOIN split_groups ON posts.split_id = split_groups.id
     WHERE friends.friend='$user' OR posts.user='$user' OR posts.visibility='public'
     GROUP BY posts.id
     ORDER BY posts.created_at DESC";
 
 $result = queryMysql($query);
+
+if (!$result) {
+    die("Database query failed: " . $connection->error);
+}
 
 $num = $result->num_rows;
 
@@ -32,12 +36,11 @@ if ($num == 0) {
         $title = htmlspecialchars($row['title']);
         $description = htmlspecialchars($row['description']);
         $slug = htmlspecialchars($row['slug']);
-        $split = htmlspecialchars($row['split']);
+        $splitName = htmlspecialchars($row['split_name']);
         $media = unserialize($row['media']);
         $numReplies = $row['num_replies'];
         $numViews = $row['num_views'];
         $created_at = date('F j, Y', strtotime($row['created_at']));
-
 
         // Determine the thumbnail source
         $thumbnailSrc = '';
@@ -51,9 +54,9 @@ if ($num == 0) {
             }
         }
         if (!$thumbnailSrc) {
-                // If no picture is posted, use the posting user's profile picture
-                $thumbnailSrc = "$postUser.jpg";
-            }
+            // If no picture is posted, use the posting user's profile picture
+            $thumbnailSrc = "$postUser.jpg";
+        }
 
         echo "<div class='post'>
             <a href='view_post.php?id=$postId-$slug'>
@@ -65,10 +68,10 @@ if ($num == 0) {
             <p>Replies: $numReplies</p>
             <p>Views: $numViews</p>";
 
-        if ($split) echo "<p>Split: $split</p>";
+        if ($splitName) echo "<p>Split: $splitName</p>";
 
-         // Display delete button if the post belongs to the logged-in user
-         if ($postUser == $user) {
+        // Display delete button if the post belongs to the logged-in user
+        if ($postUser == $user) {
             echo "<form method='post' action='delete_post.php' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'>
                 <input type='hidden' name='post_id' value='$postId'>
                 <input type='hidden' name='slug' value='$slug'>

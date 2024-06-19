@@ -7,7 +7,8 @@ echo <<<_INIT
                     <head>
                         <meta charset='utf-8'>
                         <meta name='viewport' content='width=device-width, initial-scale=1'>
-                        <link rel='stylesheet' href='styles.css'>
+                        <link rel='stylesheet' href='stylessss.css'>
+                        <link rel='icon' href='favicon.png' type='image/png'>
                         <script src='jquery-3.7.1.min.js'></script>                   
     _INIT;
 
@@ -26,13 +27,12 @@ echo <<<_INIT
 
 
     echo <<<_MAIN
-        <title>FlexGrid: $userstr</title>
         </head>
         <body>
             <div data-role='page'>
                 <div data-role='header'>
                     <div id='logo'
-                        class='center'><img id='flex' src='flexgridicon.jpg'>FlexGrid</div>
+                        class='center'>Flex<img id='flex' src='flexgridicon.jpg'>Grid</div>
                     <div class='username'>$userstr</div>
                 </div>
                 <div data-role='content'>
@@ -43,16 +43,16 @@ echo <<<_INIT
             {
         echo <<<_LOGGEDIN
                 <div class='center'>
-                    <a data-role='button' data-inline='true' data-icon='home'
+                    <a data-role='button' data-inline='true'
                         href='index.php'>Home</a>
                     <a data-role='button' data-inline='true'
                         href='members.php'>Members</a>
                     <a data-role='button' data-inline='true'
-                        href='friends.php'>Friends</a>
+                        href='splits.php'>Splits</a>
                     <a data-role='button' data-inline='true'
                         href='messages.php'>Messages</a>
                     <a data-role='button' data-inline='true'
-                        href='profile.php'>Edit Profile</a>
+                        href='my_profile.php'>Profile</a>
                     <a data-role='button' data-inline='true'
                         href='logout.php'>Log Out</a>
                     <a data-role='button' data-inline='true'
@@ -64,11 +64,11 @@ echo <<<_INIT
             {
         echo <<<_GUEST
                 <div class='center'>
-                    <a data-role='button' data-inline='true' data-icon='home'
+                    <a data-role='button' data-inline='true' 
                         href ='index.php'>Home</a>
-                    <a data-role='button' data-inline='true' data-icon='home'
+                    <a data-role='button' data-inline='true' 
                         href ='signup.php'>Sign Up</a>
-                    <a data-role='button' data-inline='true' data-icon='home'
+                    <a data-role='button' data-inline='true'
                         href ='login.php'>Log In</a>
                 </div>
                 <p class='info'>(You must be logged in to use this app)</p>
