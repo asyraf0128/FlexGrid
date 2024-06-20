@@ -3,6 +3,7 @@ require_once 'header.php';
 
 if (!$loggedin) die("</div></body></html>");
 
+echo "<div class='my_profile_container'>";
 echo "<h3>Your Profile</h3>";
 
 $user = $_SESSION['user'];
@@ -20,16 +21,18 @@ if ($result->num_rows)
     $image = $row['image'];
 
     if ($image){
-        echo '<p><img src="data:image/jpeg;base64,' . base64_encode($image) . '" alt="Profile Image" style="max-width: 200px; max-height: 200px;"></p>';
+        echo '<p><img src="data:image/jpeg;base64,' . base64_encode($image) . '" alt="Profile Image" class="profile-image"></p>';
     } else {
-        echo "<p>No profile image uploaded.</p>";
+        echo "<p class= 'profile-image'>No profile image uploaded.</p>";
     }
 
-    echo "<p>Text: $text</p>";
-    echo "<p>Workouts: $workouts</p>";
-    echo "<p>Height: $height</p>";
-    echo "<p>Weight: $weight</p>";
-    echo "<p>Country: $country</p>";
+    echo "<div class='profile-details'>";
+    echo "<p><span>Bio:</span> $text</p>";
+    echo "<p><span>Workouts:</span> $workouts</p>";
+    echo "<p><span>Height(cm):</span> $height</p>";
+    echo "<p><span>Weight(kg):</span> $weight</p>";
+    echo "<p><span>Country:</span> $country</p>";
+    echo "</div>";
 
 }
 else
@@ -37,6 +40,7 @@ else
     echo "<p>No profile details found.</p>";
 }
 
-echo "<br><a href ='edit_profile.php'>Edit Profile</a>";
-echo "</div></body></html>";
+echo "<br><a href ='edit_profile.php' class='edit-profile-link'>Edit Profile</a>";
+echo "</div>";
+echo "</body></html>";
 ?>

@@ -14,4 +14,65 @@ table {
   font-size: 30px;
 }
 
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f9;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+h3 {
+  color: #444;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 24px;
+}
+
+.container {
+  width: 80%;
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-image {
+  display: block;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+}
+
+.profile-details p {
+  font-size: 16px;
+  margin: 10px 0;
+  line-height: 1.5;
+}
+
+.profile-details p span {
+  font-weight: bold;
+}
+
+.edit-profile-link {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px 15px;
+  color: #fff;
+  background-color: #007BFF;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.edit-profile-link:hover {
+  background-color: #0056b3;
+}
 
