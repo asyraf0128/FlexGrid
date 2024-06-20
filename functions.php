@@ -50,7 +50,7 @@ function showProfile($user){
 
         if (!empty($row['image'])) {
             $imageData = base64_encode($row['image']);
-            echo "<br><img src='data:image/jpeg;base64,$imageData' alt='Profile Image'><br>";
+            echo "<br><img src='data:image/jpeg;base64,$imageData' alt='Profile Image' width='600' /><br>";
         }
         echo stripslashes($row['text']) . "<br><br>";
         echo "Workouts: " . $row['workouts'] . "<br>";
