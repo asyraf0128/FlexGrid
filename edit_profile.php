@@ -3,6 +3,7 @@
 
     if (!$loggedin) die("</div></body></html>");
 
+    echo "<div class='edit_profile_container'>";
     echo "<h3>Your Profile</h3>";
 
     $result = queryMysql("SELECT * FROM profiles WHERE user='$user'");
@@ -67,13 +68,14 @@
 showProfile($user);
 
 echo <<<_END
+<div class ='edit_profile_container'>
         <form data-ajax='false' method='post'
             action='edit_profile.php' enctype='multipart/form-data'>
         <h3>Enter or edit your details and/or upload an image</h3>
         <textarea name='text'>$text</textarea><br>
         Workouts: <input type ='number' name='workouts' value='$workouts'><br>
-        Height: <input type='text' name='height' value='$height'><br>
-        Weight: <input type='text' name='weight' value='$weight'><br>
+        Height(cm): <input type='text' name='height' value='$height'><br>
+        Weight(kg): <input type='text' name='weight' value='$weight'><br>
         Country: 
         <select name='country'>
 _END;
@@ -90,8 +92,6 @@ echo <<<_END
         <input type='submit' value='Save Profile'>
     </form>
 </div><br>
-</body>
-</html>
 _END;
-?>
+ ?>
  
