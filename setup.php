@@ -37,49 +37,68 @@
         createTable('profiles',
                     'user VARCHAR(16),
                     text VARCHAR(4096),
-                    workouts INT NOT NULL,
-                    height FLOAT,
-                    weight FLOAT,
-                    country VARCHAR(100),
-                    image LONGBLOB',
-                    );
+                    INDEX(user(6)),
+                    image LONGBLOB');
 
-        createTable('splits',
-                    'user VARCHAR(16),
-                    split VARCHAR(4096),
-                    INDEX(split(6))');
 
         createTable('posts',
                     'id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                     user VARCHAR(16),
                     title VARCHAR(255) NOT NULL,
+                    slug VARCHAR (255) NOT NULL UNIQUE,
                     description TEXT,
-                    split VARCHAR(255),
-                    image VARCHAR(255),
-                    video VARCHAR(255),
+                    split_id VARCHAR(255),
+                    media TEXT,
                     visibility ENUM(\'public\', \'private\') DEFAULT \'public\',
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    is_workout BOOLEAN DEFAULT FALSE');
-        
-        createTable('likes',
+                    is_workout BOOLEAN DEFAULT FALSE,
+                    num_replies INT UNSIGNED DEFAULT 0,
+                    num_views INT UNSIGNED DEFAULT 0');
+
+        createTable('workout_details',
                     'id INT AUTO_INCREMENT PRIMARY KEY,
-                    user VARCHAR(16),
-                    post_id INT,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
-        
-        createTable('comments',
-                    'id INT AUTO_INCREMENT PRIMARY KEY,
-                    user VARCHAR(16),
-                    post_id INT,
-                    comment TEXT,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
-                
-        createTable('shares',
-                    'id INT AUTO_INCREMENT PRIMARY KEY,
-                    user VARCHAR(16),
-                    post_id INT,
+                    post_id INT NOT NULL,
+                    workout_id INT NOT NULL,
+                    weight DECIMAL(5,2),
+                    sets INT,
+                    reps INT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
 
+        createTable('replies',
+                    'id INT AUTO_INCREMENT PRIMARY KEY,
+                    post_id INT NOT NULL,
+                    user VARCHAR(255) NOT NULL,
+                    text TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+
+        createTable('split_groups',
+                    'id INT AUTO_INCREMENT PRIMARY KEY,
+                    user VARCHAR(255) NOT NULL,
+                    name VARCHAR(255) NOT NULL,
+                    is_default BOOLEAN DEFAULT FALSE');
+                    
+                    
+        createTable('splits',
+                    'id INT AUTO_INCREMENT PRIMARY KEY,
+                    group_id INT NOT NULL,
+                    name VARCHAR(255) NOT NULL');
+                    
+        createTable('workouts', 
+                    'id INT AUTO_INCREMENT PRIMARY KEY,
+                    split_id INT NOT NULL,
+                    name VARCHAR(255) NOT NULL,
+                    last_weight DECIMAL(5,2),
+                    last_sets INT,
+                    last_reps INT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+                    
+                    
+        createTable('sets_reps',
+                    'id INT AUTO_INCREMENT PRIMARY KEY,
+                    workout_id INT NOT NULL,
+                    sets INT NOT NULL,
+                    reps INT NOT NULL');
+                         
         
         ?>
             <br>...done.

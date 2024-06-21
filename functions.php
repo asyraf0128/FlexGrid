@@ -54,4 +54,57 @@ function showProfile($user){
         }
     }
 }
+
+function generateSlug($string) {
+    $slug = preg_replace('/[^A-Za-z0-9-]+/', '-', strtolower($string));
+    return trim($slug, '-');
+}
+
+
+function fetchWorkoutFrequencyData() {
+    global $connection; // Assuming $connection is your MySQLi connection object
+
+    $query = "SELECT DATE(created_at) AS workout_date, COUNT(*) AS num_workouts
+              FROM posts
+              WHERE is_workout = 1
+              GROUP BY workout_date";
+    $result = $connection->query($query);
+
+    $labels = [];
+    $data = [];
+
+    while ($row = $result->fetch_assoc()) {
+        $labels[] = $row['workout_date'];
+        $data[] = $row['num_workouts'];
+    }
+
+    return [
+        'labels' => $labels,
+        'data' => $data
+    ];
+}
+
+// Function to fetch workout intensity data from posts table
+function fetchWorkoutIntensityData() {
+    global $connection; // Assuming $connection is your MySQLi connection object
+
+    $query = "SELECT DATE(created_at) AS workout_date, AVG(media) AS avg_weight
+              FROM posts
+              WHERE is_workout = 1 AND media IS NOT NULL
+              GROUP BY workout_date";
+    $result = $connection->query($query);
+
+    $labels = [];
+    $data = [];
+
+    while ($row = $result->fetch_assoc()) {
+        $labels[] = $row['workout_date'];
+        $data[] = $row['avg_weight'];
+    }
+
+    return [
+        'labels' => $labels,
+        'data' => $data
+    ];
+}
 ?>
