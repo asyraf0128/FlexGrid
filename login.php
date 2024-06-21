@@ -31,12 +31,10 @@
 
     echo <<<_END
             <form method='post' action='login.php'>
-            <div class="imgcontainer">
-                <img src="flexgridlogo.jpg" alt="Logo" class="logo">
-            </div>
             
-            <div class="container">
-                <div class="form-box">
+            <div class="container" id="container">
+                <div class="form-container">
+                    <div class="title">FlexGrid</div>
                     <div data-role='fieldcontain'>
                         <label></label>
                         <span class='error'>$error</span>

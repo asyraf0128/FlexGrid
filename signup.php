@@ -54,12 +54,14 @@ _END;
 
     echo <<<_END
     <form method='post' action='signup.php'>$error
-    <div class="imgcontainer">
-        <img src="flexgridlogo.jpg" alt="Logo" class="logo">
-    </div>
 
-    <div class="container">
-        <div class="form-box">
+    <div class="container" id="container">
+        <div class="form-container">
+            <div class="title">FlexGrid</div>
+            <div data-role='fieldcontain'>
+                <label></label>
+                <span class='error'>$error</span>
+            </div>
             <div data-role='fieldcontain' class='details'>
                 <label></label>
                 Please enter your desired username and password
@@ -75,7 +77,7 @@ _END;
             </div>
             <div data-role='fieldcontain'>
                 <label></label>
-                <input class='button' data-transition='slide' type='submit' value='Sign Up'>
+                <input classs='button' data-transition='slide' type='submit' value='Sign Up'>
             </div>
         </div>
     </div>
