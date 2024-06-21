@@ -141,11 +141,6 @@ input[type="file"]::file-selector-button:hover {
     text-align: center;
 }
 
-.profile-image-previes {
-    text-align: center;
-    margin-top: 20px;
-}
-
 .profile-image {
     max-width: 100%;
     height: auto;

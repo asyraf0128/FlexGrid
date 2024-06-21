@@ -37,8 +37,12 @@
         createTable('profiles',
                     'user VARCHAR(16),
                     text VARCHAR(4096),
-                    INDEX(user(6)),
-                    image LONGBLOB');
+                    workouts INT NOT NULL,
+                    height FLOAT,
+                    weight FLOAT,
+                    country VARCHAR(100),
+                    image LONGBLOB',
+                    );
 
         createTable('splits',
                     'user VARCHAR(16),

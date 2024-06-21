@@ -52,12 +52,6 @@ function showProfile($user){
             $imageData = base64_encode($row['image']);
             echo "<br><img src='data:image/jpeg;base64,$imageData' alt='Profile Image' width='600' /><br>";
         }
-        echo stripslashes($row['text']) . "<br><br>";
-        echo "Workouts: " . $row['workouts'] . "<br>";
-        echo "Height: " . $row['height'] . "<br>";
-        echo "Weight: " . $row['weight'] . "<br>";
-        echo "Country: " . $row['country'] . "<br>";
-
     }
 }
 ?>
