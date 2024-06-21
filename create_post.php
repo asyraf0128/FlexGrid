@@ -16,8 +16,12 @@ $visibility = 'public';
 $mediaPaths = [];
 $user = $_SESSION['user'];
 
-// Fetch split groups for the logged-in user
-$splitGroups = queryMysql("SELECT * FROM split_groups WHERE user='$user'");
+// Fetch default split group id for the user (it should always exist)
+$defaultSplit = queryMysql("SELECT id FROM split_groups WHERE user='$user' AND is_default=TRUE");
+$defaultSplitId = $defaultSplit->num_rows > 0 ? $defaultSplit->fetch_assoc()['id'] : null;
+
+// Fetch splits for the default split group
+$splits = queryMysql("SELECT * FROM splits WHERE group_id='$defaultSplitId'");
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -27,12 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    // Fetch default split group id for the user (if needed)
-    $defaultSplit = queryMysql("SELECT id FROM split_groups WHERE user='$user' AND is_default=TRUE");
-    $defaultSplitId = $defaultSplit->num_rows > 0 ? $defaultSplit->fetch_assoc()['id'] : null;
-
     // Sanitize input values
-    $splitId = sanitizeString($_POST['split']) ?: $defaultSplitId;
+    $splitId = sanitizeString($_POST['split']);
     $title = sanitizeString($_POST['title']);
     $description = sanitizeString($_POST['description']);
     $visibility = sanitizeString($_POST['visibility']);
@@ -129,12 +129,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <select id="split" name="split" onchange="fetchWorkouts(this.value)">
                 <option value="">Select...</option>
                 <?php
-                if ($splitGroups->num_rows > 0) {
-                    while ($group = $splitGroups->fetch_assoc()) {
-                        $groupId = $group['id'];
-                        $groupName = htmlspecialchars($group['name']);
-                        $selected = $groupId == $splitId ? 'selected' : '';
-                        echo "<option value='$groupId' $selected>$groupName</option>";
+                if ($splits->num_rows > 0) {
+                    while ($split = $splits->fetch_assoc()) {
+                        $splitId = $split['id'];
+                        $splitName = htmlspecialchars($split['name']);
+                        $selected = $splitId == $defaultSplitId ? 'selected' : '';
+                        echo "<option value='$splitId' $selected>$splitName</option>";
                     }
                 }
                 ?>

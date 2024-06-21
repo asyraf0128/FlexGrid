@@ -13,10 +13,24 @@ $user = $_SESSION['user'];
 // Variable to hold redirection URL after processing POST
 $redirectUrl = 'edit_splits.php';
 
+// Check if user has any split groups
+$splitGroups = queryMysql("SELECT * FROM split_groups WHERE user='$user'");
+$hasSplitGroups = $splitGroups->num_rows > 0;
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['create_group'])) {
         $groupName = sanitizeString($_POST['group_name']);
         queryMysql("INSERT INTO split_groups (user, name) VALUES ('$user', '$groupName')");
+
+        // Check if this is the first split group for the user
+        if (!$hasSplitGroups) {
+            // Fetch the ID of the newly created split group
+            $newGroupId = $connection->insert_id; // Assuming $connection is your MySQLi connection object
+
+            // Update this group as the default for the user
+            queryMysql("UPDATE split_groups SET is_default = TRUE WHERE id = '$newGroupId'");
+        }
+
         // Redirect after POST to prevent duplicate form submission
         header("Location: $redirectUrl");
         exit;

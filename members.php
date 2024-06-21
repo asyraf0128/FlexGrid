@@ -32,40 +32,85 @@ elseif (isset($_GET['remove']))
     queryMysql("DELETE FROM friends WHERE user='$remove' AND friend='$user'");
 }
 
-$result = queryMysql("SELECT user FROM members ORDER BY user");
-$num    = $result->num_rows;
+echo <<<_HTML
+<div class="center">
+    <h2>Search Members</h2>
+    <form method="post" action="members.php">
+        <input type="text" name="searchQuery" placeholder="Enter username" required>
+        <input type="submit" value="Search">
+    </form>
+</div>
+_HTML;
 
-echo "<h3>Other Members</h3><ul>";
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchQuery'])) {
+    $searchQuery = sanitizeString($_POST['searchQuery']);
+    $result = queryMysql("SELECT user FROM members WHERE user='$searchQuery'");
 
-for ($j = 0 ; $j < $num ; ++$j)
+    if ($result->num_rows) {
+        $row = $result->fetch_array(MYSQLI_ASSOC);
+        $searchedUser = $row['user'];
+        echo "<ul>";
+        echo "<li><a href='members.php?view=$searchedUser'>$searchedUser</a>";
+        $follow = "follow";
+
+        // Check if you are following them
+        $result1 = queryMysql("SELECT * FROM friends WHERE user='$searchedUser' AND friend='$user'");
+        $t1 = $result1->num_rows;
+
+        // Check if they are following you
+        $result2 = queryMysql("SELECT * FROM friends WHERE user='$user' AND friend='$searchedUser'");
+        $t2 = $result2->num_rows;
+
+        if (($t1 + $t2) > 1) echo " &harr; is a mutual friend";
+        elseif ($t1)         echo " &larr; you are following";
+        elseif ($t2)         { echo " &rarr; is following you";
+                               $follow = "recip"; }
+
+        // Display follow/unfollow link based on follow status
+        if (!$t1) 
+            echo " [<a href='members.php?add=$searchedUser'>$follow</a>]";
+        else
+            echo " [<a href='members.php?remove=$searchedUser'>unfollow</a>]";
+
+        echo "</li></ul>";
+    } else {
+        echo "<p>No user found with username '$searchQuery'.</p>";
+    }
+}
+
+echo "<h3>Members You Follow</h3><ul>";
+
+$result = queryMysql("SELECT user FROM friends WHERE friend='$user'");
+$num = $result->num_rows;
+
+for ($j = 0; $j < $num; ++$j)
 {
     $row = $result->fetch_array(MYSQLI_ASSOC);
-    if ($row['user'] == $user) continue;
+    $followedUser = $row['user'];
 
-    echo "<li><a href='members.php?view=" . $row['user'] . "'>" . $row['user'] . "</a>";
+    echo "<li><a href='members.php?view=$followedUser'>$followedUser</a>";
     $follow = "follow";
 
     // Check if you are following them
-    $result1 = queryMysql("SELECT * FROM friends WHERE user='" . $row['user'] . "' AND friend='$user'");
-    $t1      = $result1->num_rows;
+    $result1 = queryMysql("SELECT * FROM friends WHERE user='$followedUser' AND friend='$user'");
+    $t1 = $result1->num_rows;
 
     // Check if they are following you
-    $result2 = queryMysql("SELECT * FROM friends WHERE user='$user' AND friend='" . $row['user'] . "'");
-    $t2      = $result2->num_rows;
+    $result2 = queryMysql("SELECT * FROM friends WHERE user='$user' AND friend='$followedUser'");
+    $t2 = $result2->num_rows;
 
-    if(($t1 + $t2) > 1) echo " &harr; is a mutual friend";
+    if (($t1 + $t2) > 1) echo " &harr; is a mutual friend";
     elseif ($t1)         echo " &larr; you are following";
-    elseif ($t2)      { echo " &rarr; is following you";
-                        $follow = "recip"; }
+    elseif ($t2)         { echo " &rarr; is following you";
+                           $follow = "recip"; }
 
     // Display follow/unfollow link based on follow status
     if (!$t1) 
-        echo " [<a href='members.php?add=" . $row['user'] . "'>$follow</a>]";
+        echo " [<a href='members.php?add=$followedUser'>$follow</a>]";
     else
-        echo " [<a href='members.php?remove=" . $row['user'] . "'>unfollow</a>]";
+        echo " [<a href='members.php?remove=$followedUser'>unfollow</a>]";
 
     echo "</li>";
 }
 echo "</ul></div></body></html>";
 ?>
-

@@ -1,8 +1,6 @@
 <?php
 require_once 'header.php';
 
-echo "<title>Welcome to FlexGrid</title>";
-
 if (!$loggedin) die("</div></body></html>");
 
 echo "<div class='center'>";
@@ -54,8 +52,14 @@ if ($num == 0) {
             }
         }
         if (!$thumbnailSrc) {
-            // If no picture is posted, use the posting user's profile picture
-            $thumbnailSrc = "$postUser.jpg";
+            // Check if the user's profile picture exists
+            $profilePicPath = "$postUser.jpg";
+            if (file_exists($profilePicPath)) {
+                $thumbnailSrc = $profilePicPath;
+            } else {
+                // Use the default icon if no other image is available
+                $thumbnailSrc = "icon2.jpg";
+            }
         }
 
         echo "<div class='post'>
