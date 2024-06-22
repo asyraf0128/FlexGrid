@@ -4,141 +4,141 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 require_once 'header.php';
 
-if (!$loggedin) die("</div></body></html>");
+// Check if user is logged in
+if (!$loggedin) {
+    die("Please log in to edit a post.");
+}
 
 $error = '';
-$postId = '';
-$title = '';
-$description = '';
-$split = '';
-$visibility = '';
-$mediaPaths = [];
+$user = $_SESSION['user'];
+$postId = isset($_GET['id']) ? sanitizeString($_GET['id']) : null;
 
-// Fetch split groups for the logged-in user
-$splitGroups = queryMysql("SELECT * FROM split_groups WHERE user='$user'");
-
-if (isset($_GET['id'])) {
-    $postId = sanitizeString($_GET['id']);
-    $post = queryMysql("SELECT * FROM posts WHERE id='$postId' AND user='$user'");
-
-    if ($post->num_rows == 0) {
-        die("Post not found or you don't have permission to edit this post.</div></body></html>");
+// Validate and fetch post details for editing
+if ($postId) {
+    $postResult = queryMysql("SELECT * FROM posts WHERE id='$postId' AND user='$user'");
+    if ($postResult->num_rows > 0) {
+        $post = $postResult->fetch_assoc();
+        $title = htmlspecialchars($post['title']);
+        $description = htmlspecialchars($post['description']);
+        $visibility = $post['visibility'];
+        $mediaPaths = unserialize($post['media']);
+        $splitId = $post['split_id'];
+    } else {
+        $error = "Post not found or you do not have permission to edit this post.";
     }
-
-    $post = $post->fetch_assoc();
-    $title = htmlspecialchars($post['title']);
-    $description = htmlspecialchars($post['description']);
-    $split = $post['split'];
-    $visibility = $post['visibility'];
-    $mediaPaths = unserialize($post['media']);
+} else {
+    $error = "Invalid post ID.";
 }
+
+// Fetch splits for the default split group
+$defaultSplit = queryMysql("SELECT id FROM split_groups WHERE user='$user' AND is_default=TRUE");
+$defaultSplitId = $defaultSplit->num_rows > 0 ? $defaultSplit->fetch_assoc()['id'] : null;
+$splits = queryMysql("SELECT * FROM splits WHERE group_id='$defaultSplitId'");
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Discard action
     if (isset($_POST['discard'])) {
         header("Location: index.php");
         exit();
     }
 
-    // Sanitize input values
     $splitId = sanitizeString($_POST['split']);
-    $title = sanitizeString($_POST['title']);
     $description = sanitizeString($_POST['description']);
     $visibility = sanitizeString($_POST['visibility']);
 
-    // Generate unique slug for the post
-    $slug = generateSlug($title);
-    $existingSlugs = queryMysql("SELECT slug FROM posts WHERE slug LIKE '$slug%' AND id != '$postId'");
-    $slugCount = $existingSlugs->num_rows;
-    if ($slugCount > 0) {
-        $slug .= '-' . ($slugCount + 1);
-    }
+    $uploadsDir = 'uploads/';
+    $mediaPaths = [];
+    $mediaUploaded = false;
 
-    // Validate title
-    if (empty($title)) {
-        $error = 'Title is required.';
-    } else {
-        // Handle file uploads
-        $uploadsDir = 'uploads/';
-        $mediaUploaded = false;
+    foreach ($_FILES['media']['name'] as $key => $name) {
+        if (!empty($name)) {
+            $mediaPath = $uploadsDir . basename($name);
+            $tmpName = $_FILES['media']['tmp_name'][$key];
 
-        foreach ($_FILES['media']['name'] as $key => $name) {
-            if (!empty($name)) {
-                $mediaPath = $uploadsDir . basename($name);
-                $tmpName = $_FILES['media']['tmp_name'][$key];
+            if (file_exists($tmpName) && is_uploaded_file($tmpName)) {
+                $fileType = mime_content_type($tmpName);
 
-                if (file_exists($tmpName) && is_uploaded_file($tmpName)) {
-                    $fileType = mime_content_type($tmpName);
-
-                    // Check file type (image or video)
-                    if (strpos($fileType, 'image/') === 0 || strpos($fileType, 'video/') === 0) {
-                        if (move_uploaded_file($tmpName, $mediaPath)) {
-                            $mediaPaths[] = $mediaPath;
-                            $mediaUploaded = true;
-                        } else {
-                            $error = 'Failed to upload file: ' . $name;
-                            break;
-                        }
+                if (strpos($fileType, 'image/') === 0 || strpos($fileType, 'video/') === 0) {
+                    if (move_uploaded_file($tmpName, $mediaPath)) {
+                        $mediaPaths[] = $mediaPath;
+                        $mediaUploaded = true;
                     } else {
-                        $error = 'Invalid file type: ' . $name;
+                        $error = 'Failed to upload file: ' . $name;
                         break;
                     }
                 } else {
-                    $error = 'Temporary file for ' . $name . ' does not exist.';
+                    $error = 'Invalid file type: ' . $name;
                     break;
                 }
+            } else {
+                $error = 'Temporary file for ' . $name . ' does not exist.';
+                break;
             }
         }
+    }
 
-        // If no errors, proceed to update the database
-        if (empty($error)) {
-            $is_workout = !empty($split) ? 1 : 0;
-            $mediaSerialized = $mediaUploaded ? "'" . serialize($mediaPaths) . "'" : 'NULL';
+    if (empty($error)) {
+        $is_workout = !empty($splitId) ? 1 : 0;
+        $mediaSerialized = $mediaUploaded ? "'" . serialize($mediaPaths) . "'" : 'NULL';
 
-            // Update post in database
-            $result = queryMysql("UPDATE posts SET title='$title', slug='$slug', description='$description', split='$splitId', media=$mediaSerialized, visibility='$visibility', is_workout='$is_workout' WHERE id='$postId' AND user='$user'");
+        $query = "UPDATE posts SET description='$description', split_id='$splitId', media=$mediaSerialized, visibility='$visibility', is_workout='$is_workout' WHERE id='$postId' AND user='$user'";
 
-            if ($result) {
-                header("Location: index.php");
-                exit();
-            } else {
-                $error = 'Failed to update post. Please try again.';
+        if (queryMysql($query)) {
+            if (!empty($_POST['workouts'])) {
+                queryMysql("DELETE FROM workout_details WHERE post_id='$postId'");
+
+                foreach ($_POST['workouts'] as $workoutId => $details) {
+                    $weight = sanitizeString($details['weight']) ?: 'NULL';
+                    $sets = sanitizeString($details['sets']) ?: 'NULL';
+                    $reps = sanitizeString($details['reps']) ?: 'NULL';
+
+                    queryMysql("INSERT INTO workout_details (post_id, workout_id, weight, sets, reps) VALUES ('$postId', '$workoutId', $weight, $sets, $reps)");
+                    queryMysql("UPDATE workouts SET last_weight=$weight, last_sets=$sets, last_reps=$reps WHERE id='$workoutId'");
+                }
             }
+            header("Location: index.php");
+            exit();
+        } else {
+            $error = 'Failed to update post. Please try again.';
         }
     }
 }
 ?>
 
-<div>
+<!-- HTML Form to Edit Post -->
+<div class="center">
     <h3>Edit Post</h3>
+</div>
+
+<div class="post-background-form">
     <form method="post" action="edit_post.php?id=<?= $postId ?>" enctype="multipart/form-data" onsubmit="return confirmDiscard(event)">
         <div data-role="fieldcontain">
             <label for="title">Post Title:</label>
-            <input type="text" id="title" name="title" value="<?= $title ?>" required>
+            <br>
+            <input type="text" id="title" name="title" value="<?= $title ?>" disabled>
         </div>
         <div data-role="fieldcontain">
             <label for="description">Post Description:</label>
-            <textarea id="description" name="description"><?= $description ?></textarea>
+            <br>
+            <textarea id="description" name="description" placeholder="Enter your post description..."><?= $description ?></textarea>
         </div>
         <div data-role="fieldcontain">
             <label for="split">Select Split:</label>
-            <br>
-            <select id="split" name="split">
+            <select id="split" name="split" onchange="fetchWorkouts(this.value)">
                 <option value="">Select...</option>
                 <?php
-                if ($splitGroups->num_rows > 0) {
-                    while ($group = $splitGroups->fetch_assoc()) {
-                        $groupId = $group['id'];
-                        $groupName = htmlspecialchars($group['name']);
-                        $selected = $groupId == $split ? 'selected' : '';
-                        echo "<option value='$groupId' $selected>$groupName</option>";
+                if ($splits->num_rows > 0) {
+                    while ($split = $splits->fetch_assoc()) {
+                        $splitId = $split['id'];
+                        $splitName = htmlspecialchars($split['name']);
+                        $selected = $splitId == $post['split_id'] ? 'selected' : '';
+                        echo "<option value='$splitId' $selected>$splitName</option>";
                     }
                 }
                 ?>
             </select>
         </div>
-        <br>
+        <div id="workout-container"></div>
         <div data-role="fieldcontain">
             <label for="visibility">Post Visibility:</label>
             <select id="visibility" name="visibility">
@@ -151,26 +151,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <input type="file" class="link-button" id="media" name="media[]" accept="image/*,video/*" multiple onchange="previewFiles()">
         </div>
         <div id="preview-container">
-            <!-- Existing Thumbnails will be shown here -->
-            <?php
-            if (!empty($mediaPaths)) {
-                foreach ($mediaPaths as $mediaPath) {
-                    if (strpos(mime_content_type($mediaPath), 'image/') === 0) {
-                        echo "<img src='$mediaPath' style='max-width: 100px; max-height: 100px;'>";
-                    } else if (strpos(mime_content_type($mediaPath), 'video/') === 0) {
-                        echo "<video src='$mediaPath' style='max-width: 100px; max-height: 100px;' controls></video>";
-                    }
-                }
-            }
-            ?>
+            <?php foreach ($mediaPaths as $mediaPath): ?>
+                <?php if (strpos($mediaPath, 'uploads/') !== false): ?>
+                    <?php if (strpos(mime_content_type($mediaPath), 'image/') === 0): ?>
+                        <img src="<?= $mediaPath ?>" style="max-width: 200px; max-height: 200px;">
+                    <?php elseif (strpos(mime_content_type($mediaPath), 'video/') === 0): ?>
+                        <video controls style="max-width: 200px; max-height: 200px;">
+                            <source src="<?= $mediaPath ?>" type="<?= mime_content_type($mediaPath) ?>">
+                            Your browser does not support the video tag.
+                        </video>
+                    <?php endif; ?>
+                <?php endif; ?>
+            <?php endforeach; ?>
         </div>
         <div data-role="fieldcontain">
-            <button type="button" class="link-button" onclick="removeFiles()">Remove Media</button>
+            <button type="button" onclick="removeFiles()" class="link-button">Remove Media</button>
         </div>
         <br>
         <div data-role="fieldcontain">
-            <input type="submit" class="link-button" value="Update Post">
-            <button type="submit" class="link-button" name="discard" value="discard">Discard Changes</button>
+            <input type="submit" value="Update Post" class="link-button">
+            <button type="submit" name="discard" value="discard" class="link-button">Discard Changes</button>
         </div>
     </form>
     <div class="center"><?= $error ?></div>
@@ -192,6 +192,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     preview.controls = true;
                 }
                 preview.src = event.target.result;
+                preview.style.maxWidth = '200px';
+                preview.style.maxHeight = '200px';
                 previewContainer.appendChild(preview);
             };
             reader.readAsDataURL(file);
@@ -205,10 +207,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     function confirmDiscard(event) {
         if (event.submitter.name === 'discard') {
-            return confirm('Are you sure you want to discard the changes?');
+            return confirm('Are you sure you want to discard your changes?');
         }
         return true;
     }
+
+    function fetchWorkouts(splitId) {
+        if (!splitId) {
+            document.getElementById('workout-container').innerHTML = '';
+            return;
+        }
+
+        fetch('fetch_workouts.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                split_id: splitId
+            })
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('workout-container').innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error fetching workouts:', error);
+        });
+    }
 </script>
-</body>
-</html>

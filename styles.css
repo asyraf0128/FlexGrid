@@ -386,7 +386,7 @@ textarea:focus {
 }
 
 ::placeholder {
-    color: rgba(241, 238, 238, 0.5);
+    color: rgba(0, 0, 0, 0.5);
 }
 
 /* List and Item Styles */

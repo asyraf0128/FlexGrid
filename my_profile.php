@@ -96,11 +96,18 @@ if ($postResult->num_rows) {
 
         // Display delete button if the post belongs to the logged-in user
         if ($postUser == $user) {
-            echo "<form method='post' action='delete_post.php' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'>
-                <input type='hidden' name='post_id' value='$postId'>
-                <input type='hidden' name='slug' value='$slug'>
-                <button type='submit' class='link-button'>Delete</button>
-            </form>";
+            echo "<div class='post-actions'>
+                <form method='get' action='edit_post.php' class='inline-form'>
+                    <input type='hidden' name='post_id' value='$postId'>
+                    <input type='hidden' name='slug' value='$slug'>
+                    <button type='submit' class='link-button'>Edit</button>
+                </form>
+                <form method='post' action='delete_post.php' class='inline-form' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'>
+                    <input type='hidden' name='post_id' value='$postId'>
+                    <input type='hidden' name='slug' value='$slug'>
+                    <button type='submit' class='link-button'>Delete</button>
+                </form>
+            </div>";
         }
 
         echo "</div></div>";
