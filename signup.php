@@ -1,6 +1,5 @@
 <?php
     require_once 'header.php';
-    require_once 'functions.php'; // Assuming this file contains sanitizeString, queryMysql, and destroySession functions
 
     echo <<<_END
     <script>
@@ -55,7 +54,7 @@ _END;
     echo <<<_END
     <form method='post' action='signup.php'>$error
 
-    <div class="container" id="container">
+    <div class="container" id="container-signup">
         <div class="form-container">
             <div class="title">FlexGrid</div>
             <div data-role='fieldcontain'>

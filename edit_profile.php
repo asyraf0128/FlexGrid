@@ -34,6 +34,9 @@
         // Insert a new profile
         queryMysql("INSERT INTO profiles (user, text, workouts, height, weight, country, image) VALUES ('$user', '$text', '$workouts', '$height', '$weight', '$country', '$image')");
     }
+
+    header("Location: my_profile.php");
+    exit;
 }
     else
     {
@@ -65,7 +68,7 @@ showProfile($user);
 
 echo <<<_END
         <form data-ajax='false' method='post'
-            action='profile.php' enctype='multipart/form-data'>
+            action='edit_profile.php' enctype='multipart/form-data'>
         <h3>Enter or edit your details and/or upload an image</h3>
         <textarea name='text'>$text</textarea><br>
         Workouts: <input type ='number' name='workouts' value='$workouts'><br>

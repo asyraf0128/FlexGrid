@@ -1,71 +1,103 @@
 <?php
-    require_once 'header.php';
+require_once 'header.php';
 
-    if (!$loggedin) die("</div></body></html>");
+if (!$loggedin) die("</div></body></html>");
 
-    if (isset($_GET['view']))
-    {
-        $view = sanitizeString($_GET['view']);
+if (isset($_GET['view'])) {
+    $view = sanitizeString($_GET['view']);
 
-        if ($view == $user) $name = "Your";
-        else                $name = "$view's";
+    if ($view == $user) $name = "Your";
+    else                $name = "$view's";
 
-        echo "<h3>$name Profile</h3>";
+    echo "<div class='container'><h3>$name Profile</h3>";
 
-        showProfile($view);
-        echo "<a class='button'
-             href='messages.php?view=$view'>View $name messages</a>";
-        die("</div></body></html>");
-    }
+    showProfile($view);
+    echo "<a class='button' href='messages.php?view=$view'>View $name messages</a>";
+    die("</div></body></html>");
+}
 
-    if (isset($_GET['add']))
-    {
-        $add = sanitizeString($_GET['add']);
+if (isset($_GET['add'])) {
+    $add = sanitizeString($_GET['add']);
 
-        $result = queryMysql("SELECT * FROM friends
-            WHERE user='$add' AND friend='$user'");
-        if(!$result->num_rows)
-            queryMysql("INSERT INTO friends VALUES ('$add', '$user')");
-    }
-    elseif (isset($_GET['remove']))
-    {
-        $remove = sanitizeString($_GET['remove']);
-        queryMysql("DELETE FROM friends WHERE user='$remove' AND friend='$user'");
-    }
+    $result = queryMysql("SELECT * FROM friends WHERE user='$add' AND friend='$user'");
+    if (!$result->num_rows)
+        queryMysql("INSERT INTO friends VALUES ('$add', '$user')");
+} elseif (isset($_GET['remove'])) {
+    $remove = sanitizeString($_GET['remove']);
+    queryMysql("DELETE FROM friends WHERE user='$remove' AND friend='$user'");
+}
 
-    $result = queryMySQL("SELECT user FROM members ORDER BY user");
-    $num    = $result->num_rows;
+echo <<<_HTML
+<div class="container">
+    <h2>Search Members</h2>
+    <form method="post" action="members.php" class="center">
+        <input type="text" name="searchQuery" class="input-text" placeholder="Enter username" required>
+        <button type="submit" class="button">Search</button>
+    </form>
+_HTML;
 
-    echo "<h3>Other Members</h3><ul>";
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchQuery'])) {
+    $searchQuery = sanitizeString($_POST['searchQuery']);
+    $result = queryMysql("SELECT user FROM members WHERE user='$searchQuery'");
 
-    for ($j = 0 ; $j < $num ; ++$j)
-    {
+    if ($result->num_rows) {
         $row = $result->fetch_array(MYSQLI_ASSOC);
-        if ($row['user'] == $user) continue;
+        $searchedUser = $row['user'];
+        echo "<ul class='list-group'>";
+        echo "<li class='list-group-item'><a href='members.php?view=$searchedUser'>$searchedUser</a>";
+        $follow = "Follow";
 
-        echo "<li><a href='members.php?view=" .
-            $row['user'] . "'>" . $row['user'] . "</a>";
-        $follow = "follow";
+        $result1 = queryMysql("SELECT * FROM friends WHERE user='$searchedUser' AND friend='$user'");
+        $t1 = $result1->num_rows;
 
-        $result1 = queryMysql("SELECT * FROM friends WHERE
-            user='" . $row['user'] . "' AND friend='$user'");
-        $t1      = $result1->num_rows;
-        $result1 = queryMysql("SELECT * FROM friends WHERE
-            user='$user' AND friend='" . $row['user'] . "'");
-        $t2      = $result1->num_rows;
+        $result2 = queryMysql("SELECT * FROM friends WHERE user='$user' AND friend='$searchedUser'");
+        $t2 = $result2->num_rows;
 
-        if(($t1 + $t2) > 1) echo " &harr; is a mutual friend";
-        elseif ($t1)         echo " &larr; you are following";
-        elseif ($t2)      { echo " &rarr; is following you";
-                            $follow = "recip"; }
-        
+        if (($t1 + $t2) > 1) echo " <span class='following-text'>mutual</span>";
+        elseif ($t1)         echo " <span class='following-text'>following</span>";
+        elseif ($t2)         { echo " <span class='following-text'>follower</span>";
+                               $follow = "Reciprocate"; }
 
         if (!$t1) 
-            echo " [<a href='members.php?add=" . $row['user'] . "'>$follow</a>]";
+            echo " <a href='members.php?add=$searchedUser' class='button small'>$follow</a>";
         else
-            echo " [<a href='members.php?remove=" . $row['user'] . "'>drop</a>]";
+            echo " <button href='members.php?remove=$searchedUser' class='button'>Remove</button>";
+
+        echo "</li></ul>";
+    } else {
+        echo "<p>No user found with username '$searchQuery'.</p>";
     }
-    ?>  
-            </ul></div>
-        </body>
-    </html>
+}
+
+echo "<h3>Members You Follow</h3><ul class='list-group'>";
+
+$result = queryMysql("SELECT user FROM friends WHERE friend='$user'");
+$num = $result->num_rows;
+
+for ($j = 0; $j < $num; ++$j) {
+    $row = $result->fetch_array(MYSQLI_ASSOC);
+    $followedUser = $row['user'];
+
+    echo "<li class='list-group-item'><a href='members.php?view=$followedUser'>$followedUser</a>";
+    $follow = "Follow";
+
+    $result1 = queryMysql("SELECT * FROM friends WHERE user='$followedUser' AND friend='$user'");
+    $t1 = $result1->num_rows;
+
+    $result2 = queryMysql("SELECT * FROM friends WHERE user='$user' AND friend='$followedUser'");
+    $t2 = $result2->num_rows;
+
+    if (($t1 + $t2) > 1) echo "  <span class='following-text'>mutual</span>";
+    elseif ($t1)         echo "  <span class='following-text'>following</span>";
+    elseif ($t2)         { echo " <span class='following-text'>follower</span>";
+                           $follow = "Reciprocate"; }
+
+    if (!$t1) 
+        echo " <a href='members.php?add=$followedUser' class='button small'>$follow</a>";
+    else
+        echo " <button href='members.php?remove=$followedUser' class='button'>Remove</button>";
+
+    echo "</li>";
+}
+echo "</ul></div></body></html>";
+?>

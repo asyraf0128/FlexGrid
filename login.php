@@ -22,9 +22,7 @@
             {
                 $_SESSION['user'] = $user;
                 $_SESSION['pass'] = $pass;
-                die("You are now loggged in. Please <a data-transition='slide'
-                    href='header.php?view=$user'>click here</a> to continue.</div>
-                        </body></html>");
+                die(header("Location: index.php"));
             }
         }
     }
@@ -32,7 +30,7 @@
     echo <<<_END
             <form method='post' action='login.php'>
             
-            <div class="container" id="container">
+            <div class="container" id="container-signup">
                 <div class="form-container">
                     <div class="title">FlexGrid</div>
                     <div data-role='fieldcontain'>
