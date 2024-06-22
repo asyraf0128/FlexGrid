@@ -64,13 +64,10 @@ if (isset($_GET['id'])) {
         }
 
         // Display post details
-        echo "<div class='center'>
-                <h3>$title</h3>
-                <p>$description</p>";
+        echo "<h3>$title</h3>
+              <p>$description</p>";
 
         if ($splitName) echo "<p>Split: $splitName</p>";
-
-        echo "</div>";
 
         // Fetch and display workouts
         if ($splitId) {
@@ -78,7 +75,7 @@ if (isset($_GET['id'])) {
             $workoutsResult = queryMysql($workoutsQuery);
 
             if ($workoutsResult->num_rows > 0) {
-                echo "<div class='center'><h4>Workouts</h4>";
+                echo "<h4>Workouts</h4>";
                 while ($workoutRow = $workoutsResult->fetch_assoc()) {
                     $workoutName = htmlspecialchars($workoutRow['name']);
                     $lastWeight = htmlspecialchars($workoutRow['last_weight']);
@@ -92,49 +89,47 @@ if (isset($_GET['id'])) {
                     if (!empty($lastReps)) echo "<p>Reps: {$lastReps} reps</p>";
                     echo "</div>";
                 }
-                echo "</div>";
             } else {
-                echo "<div class='center'><p>No workouts found for this split.</p></div>";
+                echo "<p>No workouts found for this split.</p>";
             }
         }
 
-        echo "<div class='center'>       
-        <p>Posted by: $postUser</p>
-        <p>Date Posted: $created_at</p>
-        <p>Views: $numViews</p>
-        <p>Replies: $numReplies</p>";
+        echo "<p>Posted by: $postUser</p>
+              <p>Date Posted: $created_at</p>
+              <p>Views: $numViews</p>
+              <p>Replies: $numReplies>";
 
         // Display success or error message
         if (isset($_SESSION['reply_message'])) {
-            echo "<div class='center'><p>{$_SESSION['reply_message']}</p></div>";
+            echo "<p>{$_SESSION['reply_message']}</p>";
             unset($_SESSION['reply_message']);
         }
 
-         // Fetch user profile image
-         $profileResult = queryMysql("SELECT image FROM profiles WHERE user='$user'");
-         $profileImage = '';
-         if ($profileResult->num_rows == 1) {
-             $profileRow = $profileResult->fetch_assoc();
-             $profileImage = $profileRow['image'];
-         }
- 
-         // Display reply form
-         echo "<div class='reply-section'>
-                 <form method='post' action='view_post.php?id=$idSlug'>
-                     <div style='display: flex; align-items: center;'>
-                         <div>";
-         if ($profileImage) {
-             echo '<img src="data:image/jpeg;base64,' . base64_encode($profileImage) . '" alt="Profile Image" style="max-width: 50px; max-height: 50px; border-radius: 50%;">';
-         }
-         echo "        </div>
-                         <textarea name='replyText' placeholder='Write your reply here...' required style='margin-left: 10px;'></textarea>
-                         <button type='submit' name='reply' style='margin-left: 10px;'>Reply</button>
-                     </div>
-                 </form>
-             </div>";
+        // Fetch user profile image
+        $profileResult = queryMysql("SELECT image FROM profiles WHERE user='$user'");
+        $profileImage = '';
+        if ($profileResult->num_rows == 1) {
+            $profileRow = $profileResult->fetch_assoc();
+            $profileImage = $profileRow['image'];
+        }
+
+        // Display reply form
+        echo "<div class='reply-section'>
+                <form method='post' action='view_post.php?id=$idSlug'>
+                    <div style='display: flex; align-items: center;'>
+                        <div>";
+        if ($profileImage) {
+            echo '<img src="data:image/jpeg;base64,' . base64_encode($profileImage) . '" alt="Profile Image" style="max-width: 50px; max-height: 50px; border-radius: 50%;">';
+        }
+        echo "        </div>
+                        <textarea name='replyText' placeholder='Write your reply here...' required style='margin-left: 10px;'></textarea>
+                        <button type='submit' name='reply' style='margin-left: 10px;'>Reply</button>
+                    </div>
+                </form>
+            </div>";
 
         if ($repliesResult->num_rows > 0) {
-            echo "<div class='center'><h4>Replies</h4>";
+            echo "<h4>Replies</h4>";
             while ($replyRow = $repliesResult->fetch_assoc()) {
                 $replyUser = htmlspecialchars($replyRow['user']);
                 $replyText = htmlspecialchars($replyRow['text']);
@@ -144,30 +139,17 @@ if (isset($_GET['id'])) {
                         <p>$replyText</p>
                       </div>";
             }
-            echo "</div>";
         } else {
-            echo "<div class='center'><p>No replies yet. Be the first to reply!</p></div>";
+            echo "<p>No replies yet. Be the first to reply!</p>";
         }
-
-       
-
     } else {
         // Handle case where post_id is invalid or not found
-        echo "<div class='center'><p>Post not found.</p></div>";
+        echo "<p>Post not found.</p>";
     }
 } else {
     // Handle case where post_id is not provided in query string
-    echo "<div class='center'><p>Invalid request.</p></div>";
+    echo "<p>Invalid request.</p>";
 }
 
-echo "</div></body></html>";
+echo "</body></html>";
 ?>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Scroll to the bottom if the page has the #replies anchor
-    if (window.location.hash === '#replies') {
-        window.scrollTo(0, document.body.scrollHeight);
-    }
-});
-</script>
