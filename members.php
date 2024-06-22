@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchQuery'])) {
                                $follow = "Reciprocate"; }
 
         if (!$t1) 
-            echo " <a href='members.php?add=$searchedUser' class='button small'>$follow</a>";
+            echo " <button href='members.php?add=$searchedUser' class='button'>$follow</button>";
         else
             echo " <button href='members.php?remove=$searchedUser' class='button'>Remove</button>";
 
@@ -93,7 +93,7 @@ for ($j = 0; $j < $num; ++$j) {
                            $follow = "Reciprocate"; }
 
     if (!$t1) 
-        echo " <a href='members.php?add=$followedUser' class='button small'>$follow</a>";
+        echo " <button href='members.php?add=$followedUser' class='button'>$follow</button>";
     else
         echo " <button href='members.php?remove=$followedUser' class='button'>Remove</button>";
 
