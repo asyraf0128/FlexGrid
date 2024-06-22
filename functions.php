@@ -62,20 +62,21 @@ function generateSlug($string) {
 }
 
 
-function fetchWorkoutFrequencyData() {
+// Function to fetch workout frequency data for the logged-in user
+function fetchWorkoutFrequencyData($user) {
     global $connection; // Assuming $connection is your MySQLi connection object
 
-    $query = "SELECT DATE(created_at) AS workout_date, COUNT(*) AS num_workouts
+    $query = "SELECT DATE_FORMAT(created_at, '%Y-%m') AS workout_month, COUNT(*) AS num_workouts
               FROM posts
-              WHERE is_workout = 1
-              GROUP BY workout_date";
+              WHERE is_workout = 1 AND user = '$user'
+              GROUP BY workout_month";
     $result = $connection->query($query);
 
     $labels = [];
     $data = [];
 
     while ($row = $result->fetch_assoc()) {
-        $labels[] = $row['workout_date'];
+        $labels[] = $row['workout_month'];
         $data[] = $row['num_workouts'];
     }
 
@@ -85,13 +86,13 @@ function fetchWorkoutFrequencyData() {
     ];
 }
 
-// Function to fetch workout intensity data from posts table
-function fetchWorkoutIntensityData() {
+// Function to fetch workout intensity data for the logged-in user
+function fetchWorkoutIntensityData($user) {
     global $connection; // Assuming $connection is your MySQLi connection object
 
     $query = "SELECT DATE(created_at) AS workout_date, AVG(media) AS avg_weight
               FROM posts
-              WHERE is_workout = 1 AND media IS NOT NULL
+              WHERE is_workout = 1 AND media IS NOT NULL AND user = '$user'
               GROUP BY workout_date";
     $result = $connection->query($query);
 
@@ -108,4 +109,5 @@ function fetchWorkoutIntensityData() {
         'data' => $data
     ];
 }
+
 ?>

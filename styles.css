@@ -3,6 +3,7 @@ body {
     font-family: 'Orbitron', sans-serif;
     background-color: #121212;
     color: #ffffff;
+    line-height: 1.5; 
 }
 
 .navbar {
@@ -89,4 +90,174 @@ body {
 
 form {
     display: inline;
+}
+
+.split-group {
+    background-color: #4e4b4b;
+    border: 1px solid #272424;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 10px 0;
+    text-align: left;
+}
+
+.split-group h5 {
+    margin: 0px;
+    font-size: 22px;
+}
+
+
+.link-button {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    font-size: inherit;
+    text-decoration: underline;
+    font-family: inherit;
+}
+
+input[type='number'] {
+    width: 100px;
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Focus state styling */
+input[type='number']:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    outline: none;
+}
+
+.num-button {
+    border: 1px hidden #ccc;
+    color: inherit;
+    cursor: pointer;
+    padding: 4px;
+    font-size: inherit;
+    text-decoration: none;
+    font-family: inherit;
+}
+
+.link-button-edit {
+    background: none;
+    border: none;
+    color: #000;
+    cursor: pointer;
+    padding: 0;
+    font-size: inherit;
+    text-decoration: underline;
+    font-family: inherit;
+}
+
+
+/* Style for text input fields */
+input[type=text] {
+    padding: 4px;
+    font-family: inherit;
+    font-size: inherit; /* Inherit font size from parent */
+    border: 1px hidden #ccc;
+    border-radius: 4px;
+    margin: 10px;
+}
+
+.input-number {
+    padding: 4px;
+    font-family: inherit;
+    font-size: inherit; /* Inherit font size from parent */
+    border: 1px hidden #ccc;
+    border-radius: 4px;
+    margin: 10px;
+}
+
+
+.white-background-form {
+    background-color: #fff; /* White background */
+    padding: 6px; /* Adjust padding as needed */
+    border-radius: 4px; /* Rounded corners */
+    box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Optional: add shadow for depth */
+    margin-right: 20px; /* Optional: add margin for spacing between forms */
+}
+
+.post-background-form {
+    background-color: #152f3b; 
+    padding: 10px; /* Adjust padding as needed */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 0 10px rgba(2, 212, 219, 0.1); /* Optional: add shadow for depth */
+    margin: 20px; /* Optional: add margin for spacing between forms */
+}
+
+/* Style for select dropdown menus */
+select {
+    font-family: inherit;
+    margin: 10px;
+    padding: 10px; /* Padding for dropdown */
+    font-size: 16px; /* Font size */
+    border: 1px solid #ccc; /* Border color */
+    border-radius: 4px; /* Rounded corners */
+    background-color: #f9f9f9; /* Background color */
+    width: 90%; /* Full width */
+    box-sizing: border-box; /* Include padding and border in width */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover and focus effects */
+}
+
+/* Hover effect for select dropdown */
+select:hover {
+    border-color: #aaa; /* Darker border on hover */
+}
+
+/* Focus effect for select dropdown */
+select:focus {
+    border-color: #555; /* Border color on focus */
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1); /* Optional: Add shadow on focus */
+    outline: none; /* Remove default focus outline */
+}
+
+/* Style for select dropdown options */
+select option {
+    padding: 10px; /* Padding for dropdown option */
+    font-size: 16px; /* Font size */
+    font-family: inherit;
+    transition: background-color 0.3s; /* Smooth transition for background color */
+    background-color: #fafafa;
+}
+
+/* Hover effect for select dropdown options */
+select option:hover {
+    background-color: #a71a1a; /* Grey background color on hover */
+}
+
+/* Style for textarea */
+textarea {
+    font-family: inherit;
+    padding: 10px; /* Padding for textarea */
+    font-size: 16px; /* Font size */
+    border: 1px solid #ccc; /* Border color */
+    border-radius: 4px; /* Rounded corners */
+    background-color: #f9f9f9; /* Background color */
+    width: 99%; /* Full width */
+    box-sizing: border-box; /* Include padding and border in width */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition for hover and focus effects */
+    resize: vertical; /* Allow vertical resizing of textarea */
+    min-height: 150px; /* Minimum height of textarea */
+    margin: 10px;
+}
+
+/* Hover effect for textarea */
+textarea:hover {
+    border-color: #aaa; /* Darker border on hover */
+}
+
+/* Focus effect for textarea */
+textarea:focus {
+    border-color: #555; /* Border color on focus */
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1); /* Optional: Add shadow on focus */
+    outline: none; /* Remove default focus outline */
 }

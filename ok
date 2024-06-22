@@ -25,7 +25,7 @@ $splitGroups = queryMysql("SELECT * FROM split_groups WHERE user='$user'");
 echo "<h3>Your Split Groups</h3>";
 
 echo "<form method='get' action='edit_splits.php' style='margin-top: 10px;'>
-<button type='submit' class='link-button'>Edit</button>
+<button type='submit'>Edit</button>
 </form>";
 
 if ($splitGroups->num_rows > 0) {
@@ -39,7 +39,7 @@ if ($splitGroups->num_rows > 0) {
             <h5>$groupName $isDefault</h5>
             <form method='post' action='splits.php' class='set-default-form' data-group-name='$groupName'>
                 <input type='hidden' name='group_id' value='$groupId'>
-                <button type='submit' name='set_default' class='link-button'>Set as Default</button>
+                <button type='submit' name='set_default' class='set-default-button'>Set as Default</button>
             </form>";
 
         $splits = queryMysql("SELECT * FROM splits WHERE group_id='$groupId'");
@@ -86,3 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
+
+This is my splits.php. Users see all split data in this file. I need you to add css so that there is a grey box for each split group. Then make buttons underlined, similar to that of a standard hyperlink.
+
+

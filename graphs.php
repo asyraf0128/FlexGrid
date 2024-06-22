@@ -2,6 +2,9 @@
 // graphs.php
 
 require_once 'header.php';
+
+// Ensure the user is logged in
+if (!$loggedin) die("</div></body></html>");
 ?>
 
 <h2>Workout Frequency</h2>
@@ -15,7 +18,7 @@ require_once 'header.php';
 document.addEventListener('DOMContentLoaded', function() {
     // Fetch data for workout frequency
     <?php
-    $frequencyData = fetchWorkoutFrequencyData();
+    $frequencyData = fetchWorkoutFrequencyData($user); // Pass the current user
     $frequencyLabels = json_encode($frequencyData['labels']);
     $frequencyData = json_encode($frequencyData['data']);
     ?>
@@ -32,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var frequencyLayout = {
         title: 'Workout Frequency',
         xaxis: {
-            title: 'Date'
+            title: 'Month'
         },
         yaxis: {
             title: 'Number of Workouts'
@@ -43,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Fetch data for workout intensity
     <?php
-    $intensityData = fetchWorkoutIntensityData();
+    $intensityData = fetchWorkoutIntensityData($user); // Pass the current user
     $intensityLabels = json_encode($intensityData['labels']);
     $intensityData = json_encode($intensityData['data']);
     ?>
@@ -70,7 +73,5 @@ document.addEventListener('DOMContentLoaded', function() {
     Plotly.newPlot('intensityChart', intensityData, intensityLayout);
 });
 </script>
-
-<?php
-require_once 'footer.php';
-?>
+</body>
+</html>

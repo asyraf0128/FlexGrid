@@ -7,10 +7,10 @@ echo "<div class='center'>";
 
 // Get the posts from the database
 $query = "
-    SELECT posts.id, posts.user, posts.title, posts.slug, posts.description, split_groups.name as split_name, posts.media, posts.visibility, posts.created_at, posts.num_replies, posts.num_views
+    SELECT posts.id, posts.user, posts.title, posts.slug, posts.description, splits.name as split_name, posts.media, posts.visibility, posts.created_at, posts.num_replies, posts.num_views
     FROM posts 
     LEFT JOIN friends ON posts.user = friends.user
-    LEFT JOIN split_groups ON posts.split_id = split_groups.id
+    LEFT JOIN splits ON posts.split_id = splits.id
     WHERE friends.friend='$user' OR posts.user='$user' OR posts.visibility='public'
     GROUP BY posts.id
     ORDER BY posts.created_at DESC";
@@ -67,12 +67,12 @@ if ($num == 0) {
                 <img class='thumbnail' src='$thumbnailSrc' alt='Thumbnail'>
                 <h3>$title</h3>
             </a>
+            <p>Description: $description</p>
+            <p>Split: $splitName</p>
             <p>Posted by: $postUser</p>
             <p>Date Posted: $created_at</p>
             <p>Replies: $numReplies</p>
             <p>Views: $numViews</p>";
-
-        if ($splitName) echo "<p>Split: $splitName</p>";
 
         // Display delete button if the post belongs to the logged-in user
         if ($postUser == $user) {

@@ -115,14 +115,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <div class="center">
     <h3>Create a Post</h3>
+</div>
+
+<div class="post-background-form">
     <form method="post" action="create_post.php" enctype="multipart/form-data" onsubmit="return confirmDiscard(event)">
         <div data-role="fieldcontain">
             <label for="title">Post Title:</label>
+            <br>
             <input type="text" id="title" name="title" value="<?= htmlspecialchars($title) ?>" required>
         </div>
         <div data-role="fieldcontain">
             <label for="description">Post Description:</label>
-            <textarea id="description" name="description"><?= htmlspecialchars($description) ?></textarea>
+            <br>
+            <textarea id="description" name="description"  placeholder="Enter your post description..."><?= htmlspecialchars($description) ?></textarea>
         </div>
         <div data-role="fieldcontain">
             <label for="split">Select Split:</label>
@@ -150,15 +155,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
         <div data-role="fieldcontain">
             <label for="media">Upload Image/Video:</label>
-            <input type="file" id="media" name="media[]" accept="image/*,video/*" multiple onchange="previewFiles()">
+            <input type="file" class="link-button" id="media" name="media[]" accept="image/*,video/*" multiple onchange="previewFiles()">
         </div>
         <div id="preview-container"></div>
         <div data-role="fieldcontain">
-            <button type="button" onclick="removeFiles()">Remove Media</button>
+            <button type="button" onclick="removeFiles()" class="link-button">Remove Media</button>
         </div>
+        <br>
         <div data-role="fieldcontain">
-            <input type="submit" value="Create Post">
-            <button type="submit" name="discard" value="discard">Discard Post</button>
+            <input type="submit" value="Create Post" class="link-button">
+            <button type="submit" name="discard" value="discard" class="link-button">Discard Post</button>
         </div>
     </form>
     <div class="center"><?= $error ?></div> <!-- Display any errors here -->

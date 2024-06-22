@@ -53,10 +53,10 @@ if (isset($_GET['id'])) {
         $repliesQuery = "SELECT * FROM replies WHERE post_id = '$postId' ORDER BY created_at ASC";
         $repliesResult = queryMysql($repliesQuery);
 
-        // Fetch split name from split_groups
+        // Fetch split name from splits table
         $splitName = '';
         if ($splitId) {
-            $splitResult = queryMysql("SELECT name FROM split_groups WHERE id = '$splitId'");
+            $splitResult = queryMysql("SELECT name FROM splits WHERE id = '$splitId'");
             if ($splitResult->num_rows == 1) {
                 $splitRow = $splitResult->fetch_assoc();
                 $splitName = htmlspecialchars($splitRow['name']);
