@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Delete the post
         $deleteQuery = "DELETE FROM posts WHERE id='$postId' AND user='$user'";
         queryMysql($deleteQuery);
-        header("Location: index.php");
+        header("Location: my_profile.php");
         exit();
     } else {
         echo "<div class='center'>You do not have permission to delete this post.</div>";

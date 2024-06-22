@@ -25,6 +25,17 @@ if (isset($_GET['id'])) {
         exit();
     }
 
+    // Handle reply deletion
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_reply'])) {
+        $replyId = sanitizeString($_POST['reply_id']);
+        queryMysql("DELETE FROM replies WHERE id = '$replyId' AND user = '$user'");
+        queryMysql("UPDATE posts SET num_replies = num_replies - 1 WHERE id = $postId");
+        $_SESSION['reply_message'] = 'Reply deleted successfully.';
+        // Redirect to avoid resubmission
+        header("Location: view_post.php?id=$idSlug#replies");
+        exit();
+    }
+
     // Query to fetch post details
     $query = "SELECT * FROM posts WHERE id = '$postId' AND slug='$slug'";
     $result = queryMysql($query);
@@ -64,7 +75,7 @@ if (isset($_GET['id'])) {
         }
 
         // Display post details
-        echo "<div class='center'>
+        echo "<div class='post-details'>
                 <h3>$title</h3>
                 <p>$description</p>";
 
@@ -78,7 +89,7 @@ if (isset($_GET['id'])) {
             $workoutsResult = queryMysql($workoutsQuery);
 
             if ($workoutsResult->num_rows > 0) {
-                echo "<div class='center'><h4>Workouts</h4>";
+                echo "<div class='workouts-container'><h4>Workouts</h4>";
                 while ($workoutRow = $workoutsResult->fetch_assoc()) {
                     $workoutName = htmlspecialchars($workoutRow['name']);
                     $lastWeight = htmlspecialchars($workoutRow['last_weight']);
@@ -94,19 +105,21 @@ if (isset($_GET['id'])) {
                 }
                 echo "</div>";
             } else {
-                echo "<div class='center'><p>No workouts found for this split.</p></div>";
+                echo "<div class='workouts-container'><p>No workouts found for this split.</p></div>";
             }
         }
 
-        echo "<div class='center'>       
+      
+        echo"<div class='post-stats'>
         <p>Posted by: $postUser</p>
         <p>Date Posted: $created_at</p>
         <p>Views: $numViews</p>
-        <p>Replies: $numReplies</p>";
+        <p>Replies: $numReplies</p>
+        </div>";
 
         // Display success or error message
         if (isset($_SESSION['reply_message'])) {
-            echo "<div class='center'><p>{$_SESSION['reply_message']}</p></div>";
+            echo "<div class='message'><p>{$_SESSION['reply_message']}</p></div>";
             unset($_SESSION['reply_message']);
         }
 
@@ -121,35 +134,43 @@ if (isset($_GET['id'])) {
          // Display reply form
          echo "<div class='reply-section'>
                  <form method='post' action='view_post.php?id=$idSlug'>
-                     <div style='display: flex; align-items: center;'>
-                         <div>";
+                     <div class='reply-form'>
+                         <div class='profile-image'>";
          if ($profileImage) {
-             echo '<img src="data:image/jpeg;base64,' . base64_encode($profileImage) . '" alt="Profile Image" style="max-width: 50px; max-height: 50px; border-radius: 50%;">';
+             echo '<img src="data:image/jpeg;base64,' . base64_encode($profileImage) . '" alt="Profile Image" class="profile-pic">';
          }
          echo "        </div>
-                         <textarea name='replyText' placeholder='Write your reply here...' required style='margin-left: 10px;'></textarea>
-                         <button type='submit' name='reply' style='margin-left: 10px;'>Reply</button>
+                         <textarea name='replyText' placeholder='Write your reply here...' required class='reply-text'></textarea>
+                         <button type='submit' name='reply' class='reply-button'>Reply</button>
                      </div>
-                 </form>
-             </div>";
+                 </form>";
 
         if ($repliesResult->num_rows > 0) {
-            echo "<div class='center'><h4>Replies</h4>";
+            echo "<div class='replies-container'><h4>Replies</h4>";
             while ($replyRow = $repliesResult->fetch_assoc()) {
+                $replyId = $replyRow['id'];
                 $replyUser = htmlspecialchars($replyRow['user']);
                 $replyText = htmlspecialchars($replyRow['text']);
                 $replyCreatedAt = date('F j, Y, g:i a', strtotime($replyRow['created_at']));
+
                 echo "<div class='reply'>
                         <p><strong>$replyUser</strong> replied on $replyCreatedAt:</p>
-                        <p>$replyText</p>
-                      </div>";
+                        <p>$replyText</p>";
+                
+                // Display delete button if the reply belongs to the logged-in user
+                if ($replyUser == $user) {
+                    echo "<form method='post' action='view_post.php?id=$idSlug' onsubmit='return confirm(\"Are you sure you want to delete this reply?\");'>
+                            <input type='hidden' name='reply_id' value='$replyId'>
+                            <button type='submit' class='link-button' name='delete_reply'>Delete</button>
+                          </form>";
+                }
+
+                echo "</div>";
             }
             echo "</div>";
         } else {
-            echo "<div class='center'><p>No replies yet. Be the first to reply!</p></div>";
+            echo "<div class='replies-container'><p>No replies yet. Be the first to reply!</p></div>";
         }
-
-       
 
     } else {
         // Handle case where post_id is invalid or not found
@@ -171,3 +192,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+

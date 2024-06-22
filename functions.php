@@ -41,26 +41,25 @@ function sanitizeString($var)
     return $connection->real_escape_string($var);
 }
 
-function showProfile($user)
-{
-    if (file_exists("$user.jpg"))
-        echo "<img src='$user.jpg' style='float:left;'>";
-
+function showProfile($user){
     $result = queryMysql("SELECT * FROM profiles WHERE user='$user'");
-
+   
     if ($result->num_rows)
     {
         $row = $result->fetch_array(MYSQLI_ASSOC);
-        echo stripslashes($row['text']) . "<br style='clear:left;'><br>";
+
+        if (!empty($row['image'])) {
+            $imageData = base64_encode($row['image']);
+            echo "<br><img src='data:image/jpeg;base64,$imageData' alt='Profile Image' width='600' /><br>";
+        }
     }
-    else echo "<p>Nothing to see here, yet</p><br>";
 }
+
 
 function generateSlug($string) {
     $slug = preg_replace('/[^A-Za-z0-9-]+/', '-', strtolower($string));
     return trim($slug, '-');
 }
-
 
 // Function to fetch workout frequency data for the logged-in user
 function fetchWorkoutFrequencyData($user) {

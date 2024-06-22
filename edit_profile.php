@@ -86,8 +86,8 @@ foreach ($countries as $c) {
 
 echo <<<_END
         </select><br>
-        Profile Image: <input type='file' name='image' size='14'><br>
-        <input type='submit' value='Save Profile'>
+        Profile Image: <input type='file' class='link-button' name='image' size='14'><br>
+        <input type='submit' class='link-button' value='Save Profile'>
     </form>
 </div><br>
 </body>

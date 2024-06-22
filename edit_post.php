@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 ?>
 
-<div class="center">
+<div>
     <h3>Edit Post</h3>
     <form method="post" action="edit_post.php?id=<?= $postId ?>" enctype="multipart/form-data" onsubmit="return confirmDiscard(event)">
         <div data-role="fieldcontain">
@@ -123,6 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
         <div data-role="fieldcontain">
             <label for="split">Select Split:</label>
+            <br>
             <select id="split" name="split">
                 <option value="">Select...</option>
                 <?php
@@ -137,6 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 ?>
             </select>
         </div>
+        <br>
         <div data-role="fieldcontain">
             <label for="visibility">Post Visibility:</label>
             <select id="visibility" name="visibility">
@@ -146,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
         <div data-role="fieldcontain">
             <label for="media">Upload Image/Video:</label>
-            <input type="file" id="media" name="media[]" accept="image/*,video/*" multiple onchange="previewFiles()">
+            <input type="file" class="link-button" id="media" name="media[]" accept="image/*,video/*" multiple onchange="previewFiles()">
         </div>
         <div id="preview-container">
             <!-- Existing Thumbnails will be shown here -->
@@ -163,11 +165,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ?>
         </div>
         <div data-role="fieldcontain">
-            <button type="button" onclick="removeFiles()">Remove Media</button>
+            <button type="button" class="link-button" onclick="removeFiles()">Remove Media</button>
         </div>
+        <br>
         <div data-role="fieldcontain">
-            <input type="submit" value="Update Post">
-            <button type="submit" name="discard" value="discard">Discard Changes</button>
+            <input type="submit" class="link-button" value="Update Post">
+            <button type="submit" class="link-button" name="discard" value="discard">Discard Changes</button>
         </div>
     </form>
     <div class="center"><?= $error ?></div>

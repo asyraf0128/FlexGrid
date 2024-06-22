@@ -53,23 +53,33 @@ _END;
 
     echo <<<_END
     <form method='post' action='signup.php'>$error
-        <div data-role='fieldcontain'>
-            <label></label>
-            Please enter your desired username and password
+
+    <div class="container" id="container-signup">
+        <div class="form-container">
+            <div class="title">FlexGrid</div>
+            <div data-role='fieldcontain'>
+                <label></label>
+                <span class='error'>$error</span>
+            </div>
+            <div data-role='fieldcontain' class='details'>
+                <label></label>
+                Please enter your desired username and password
+            </div>
+            <div data-role='fieldcontain'>
+                <label class='username'>Username</label>
+                <input type='text' placeholder="Enter Username" maxlength='16' name='user' value='$user' onBlur='checkUser(this)'>
+                <label></label><div id='used'>&nbsp;</div>
+            </div>
+            <div data-role='fieldcontain'>
+                <label class='password'>Password</label>
+                <input type='password' placeholder="Enter Password" maxlength='16' name='pass' value='$pass'>
+            </div>
+            <div data-role='fieldcontain' class='center'>
+                <label></label>
+                <input class='button' data-transition='slide' type='submit' value='Sign Up'>
+            </div>
         </div>
-        <div data-role='fieldcontain'>
-            <label>Username</label>
-            <input type='text' maxlength='16' name='user' value='$user' onBlur='checkUser(this)'>
-            <label></label><div id='used'>&nbsp;</div>
-        </div>
-        <div data-role='fieldcontain'>
-            <label>Password</label>
-            <input type='password' maxlength='16' name='pass' value='$pass'>
-        </div>
-        <div data-role='fieldcontain'>
-            <label></label>
-            <input type='submit' value='Sign Up'>
-        </div>
+    </div>
     </form>
     </body>
     </html>

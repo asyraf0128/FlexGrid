@@ -3,8 +3,6 @@ require_once 'header.php';
 
 if (!$loggedin) die("</div></body></html>");
 
-echo "<div class='center'>";
-
 // Get the posts from the database
 $query = "
     SELECT posts.id, posts.user, posts.title, posts.slug, posts.description, splits.name as split_name, posts.media, posts.visibility, posts.created_at, posts.num_replies, posts.num_views
@@ -63,27 +61,19 @@ if ($num == 0) {
         }
 
         echo "<div class='post'>
-            <a href='view_post.php?id=$postId-$slug'>
-                <img class='thumbnail' src='$thumbnailSrc' alt='Thumbnail'>
-                <h3>$title</h3>
-            </a>
-            <p>Description: $description</p>
-            <p>Split: $splitName</p>
-            <p>Posted by: $postUser</p>
-            <p>Date Posted: $created_at</p>
-            <p>Replies: $numReplies</p>
-            <p>Views: $numViews</p>";
+            <img class='thumbnail' src='$thumbnailSrc' alt='Thumbnail'>
+            <div class='post-content'>
+                <a href='view_post.php?id=$postId-$slug'>
+                    <h3>$title</h3>
+                </a>
+                <p>$description</p>
+                <p>$splitName</p>
+                <p>Posted by: $postUser</p>
+                <p>Date Posted: $created_at</p>
+                <p>Replies: $numReplies</p>
+                <p>Views: $numViews</p>";
 
-        // Display delete button if the post belongs to the logged-in user
-        if ($postUser == $user) {
-            echo "<form method='post' action='delete_post.php' onsubmit='return confirm(\"Are you sure you want to delete this post?\");'>
-                <input type='hidden' name='post_id' value='$postId'>
-                <input type='hidden' name='slug' value='$slug'>
-                <button type='submit'>Delete</button>
-            </form>";
-        }
-
-        echo "</div>";
+        echo "</div></div>";
     }
 }
 

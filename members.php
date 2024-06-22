@@ -3,43 +3,37 @@ require_once 'header.php';
 
 if (!$loggedin) die("</div></body></html>");
 
-if (isset($_GET['view']))
-{
+if (isset($_GET['view'])) {
     $view = sanitizeString($_GET['view']);
 
-    if ($view == $user) $name = "Your";
-    else                $name = "$view's";
+    if ($view == $_SESSION['user']) $name = "Your";
+    else                            $name = "$view's";
 
-    echo "<h3>$name Profile</h3>";
+    echo "<div class='container'><h3>$name Profile</h3>";
 
     showProfile($view);
-    echo "<a class='button'
-         href='messages.php?view=$view'>View $name messages</a>";
+    echo "<a class='button' href='messages.php?view=$view'>View $name messages</a>";
     die("</div></body></html>");
 }
 
-if (isset($_GET['add']))
-{
+if (isset($_GET['add'])) {
     $add = sanitizeString($_GET['add']);
 
-    $result = queryMysql("SELECT * FROM friends WHERE user='$add' AND friend='$user'");
-    if(!$result->num_rows)
-        queryMysql("INSERT INTO friends VALUES ('$add', '$user')");
-}
-elseif (isset($_GET['remove']))
-{
+    $result = queryMysql("SELECT * FROM friends WHERE user='$add' AND friend='{$_SESSION['user']}'");
+    if (!$result->num_rows)
+        queryMysql("INSERT INTO friends VALUES ('$add', '{$_SESSION['user']}')");
+} elseif (isset($_GET['remove'])) {
     $remove = sanitizeString($_GET['remove']);
-    queryMysql("DELETE FROM friends WHERE user='$remove' AND friend='$user'");
+    queryMysql("DELETE FROM friends WHERE user='$remove' AND friend='{$_SESSION['user']}'");
 }
 
 echo <<<_HTML
-<div class="center">
+<div class="container">
     <h2>Search Members</h2>
-    <form method="post" action="members.php">
-        <input type="text" name="searchQuery" placeholder="Enter username" required>
-        <input type="submit" value="Search">
+    <form method="post" action="members.php" class="center">
+        <input type="text" name="searchQuery" class="input-text" placeholder="Enter username" required>
+        <button type="submit" class="button">Search</button>
     </form>
-</div>
 _HTML;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchQuery'])) {
@@ -49,28 +43,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchQuery'])) {
     if ($result->num_rows) {
         $row = $result->fetch_array(MYSQLI_ASSOC);
         $searchedUser = $row['user'];
-        echo "<ul>";
-        echo "<li><a href='members.php?view=$searchedUser'>$searchedUser</a>";
-        $follow = "follow";
+        echo "<ul class='list-group'>";
+        echo "<li class='list-group-item'><a href='profile.php?user=$searchedUser'>$searchedUser</a>";
+        $follow = "Follow";
 
-        // Check if you are following them
-        $result1 = queryMysql("SELECT * FROM friends WHERE user='$searchedUser' AND friend='$user'");
+        $result1 = queryMysql("SELECT * FROM friends WHERE user='$searchedUser' AND friend='{$_SESSION['user']}'");
         $t1 = $result1->num_rows;
 
-        // Check if they are following you
-        $result2 = queryMysql("SELECT * FROM friends WHERE user='$user' AND friend='$searchedUser'");
+        $result2 = queryMysql("SELECT * FROM friends WHERE user='{$_SESSION['user']}' AND friend='$searchedUser'");
         $t2 = $result2->num_rows;
 
-        if (($t1 + $t2) > 1) echo " &harr; is a mutual friend";
-        elseif ($t1)         echo " &larr; you are following";
-        elseif ($t2)         { echo " &rarr; is following you";
-                               $follow = "recip"; }
+        if (($t1 + $t2) > 1) echo " <span class='following-text'>mutual</span>";
+        elseif ($t1)         echo " <span class='following-text'>following</span>";
+        elseif ($t2)         { echo " <span class='following-text'>follower</span>";
+                               $follow = "Reciprocate"; }
 
-        // Display follow/unfollow link based on follow status
         if (!$t1) 
-            echo " [<a href='members.php?add=$searchedUser'>$follow</a>]";
+            echo " <a href='members.php?add=$searchedUser' class='button'>$follow</a>";
         else
-            echo " [<a href='members.php?remove=$searchedUser'>unfollow</a>]";
+            echo " <a href='members.php?remove=$searchedUser' class='button'>Remove</a>";
 
         echo "</li></ul>";
     } else {
@@ -78,37 +69,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['searchQuery'])) {
     }
 }
 
-echo "<h3>Members You Follow</h3><ul>";
+echo "<h3>Members You Follow</h3><ul class='list-group'>";
 
-$result = queryMysql("SELECT user FROM friends WHERE friend='$user'");
+$result = queryMysql("SELECT user FROM friends WHERE friend='{$_SESSION['user']}'");
 $num = $result->num_rows;
 
-for ($j = 0; $j < $num; ++$j)
-{
+for ($j = 0; $j < $num; ++$j) {
     $row = $result->fetch_array(MYSQLI_ASSOC);
     $followedUser = $row['user'];
 
-    echo "<li><a href='members.php?view=$followedUser'>$followedUser</a>";
-    $follow = "follow";
+    echo "<li class='list-group-item'><a href='profile.php?user=$followedUser'>$followedUser</a>";
+    $follow = "Follow";
 
-    // Check if you are following them
-    $result1 = queryMysql("SELECT * FROM friends WHERE user='$followedUser' AND friend='$user'");
+    $result1 = queryMysql("SELECT * FROM friends WHERE user='$followedUser' AND friend='{$_SESSION['user']}'");
     $t1 = $result1->num_rows;
 
-    // Check if they are following you
-    $result2 = queryMysql("SELECT * FROM friends WHERE user='$user' AND friend='$followedUser'");
+    $result2 = queryMysql("SELECT * FROM friends WHERE user='{$_SESSION['user']}' AND friend='$followedUser'");
     $t2 = $result2->num_rows;
 
-    if (($t1 + $t2) > 1) echo " &harr; is a mutual friend";
-    elseif ($t1)         echo " &larr; you are following";
-    elseif ($t2)         { echo " &rarr; is following you";
-                           $follow = "recip"; }
+    if (($t1 + $t2) > 1) echo "  <span class='following-text'>mutual</span>";
+    elseif ($t1)         echo "  <span class='following-text'>following</span>";
+    elseif ($t2)         { echo " <span class='following-text'>follower</span>";
+                           $follow = "Reciprocate"; }
 
-    // Display follow/unfollow link based on follow status
     if (!$t1) 
-        echo " [<a href='members.php?add=$followedUser'>$follow</a>]";
+        echo " <a href='members.php?add=$followedUser' class='button'>$follow</a>";
     else
-        echo " [<a href='members.php?remove=$followedUser'>unfollow</a>]";
+        echo " <a href='members.php?remove=$followedUser' class='button'>Remove</a>";
 
     echo "</li>";
 }
