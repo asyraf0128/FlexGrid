@@ -258,3 +258,95 @@ input[type="file"]::file-selector-button:hover {
     border-radius: 5px;
 }
 
+.center {
+    text-align: center;
+    margin: 20px auto;
+    max-width: 800px;
+    background-color: #121212;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+    font-size: 24px;
+}
+
+h4 {
+    font-size: 20px;
+}
+
+p {
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* Reply form and replies section */
+.reply-section {
+    margin-top: 20px;
+    background-color: #121212;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.reply-section form {
+    display: flex;
+    align-items: center;
+}
+
+.reply-section textarea {
+    flex: 1;
+    min-height: 50px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.reply-section button {
+    padding: 8px 16px;
+    font-size: 14px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.reply {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #121212;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.reply p {
+    margin: 5px 0;
+}
+
+/* Workouts section */
+.workout {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #121212;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.workout p {
+    margin: 5px 0;
+}
+
+.workout strong {
+    font-weight: bold;
+}
+
+/* Profile image styling */
+.reply-section img {
+    max-width: 50px;
+    max-height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
