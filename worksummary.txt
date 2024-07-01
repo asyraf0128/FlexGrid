@@ -1,0 +1,32 @@
+Completed code work summary: 
+
+Despite work div listed on previous clickup cards, actual contributed work may vary in the final submitted work. Commits, additions and deletions in main are heavily unreliable due to the following reasons: 
+
+    Use of force push 
+
+    Usage of external library 
+
+    Multiple occasions of system reworks  
+
+    Improper merging and instead overwriting files outright 
+
+ 
+
+Amir Asyraf: 
+
+Completed Signup, login, checkuser, replies, create post, view post, index, header, profiles members pages and CSS 
+
+Contributed to my_profiles and other css pages and various bugfixes 
+
+ 
+
+Jireh Chai: 
+Completed my_profile, edit_profile and CSS 
+
+Contributed to functions, setup.php and various bugfixes, in-depth testing 
+
+ 
+
+Asyran: 
+
+Css to signup, login and members 
